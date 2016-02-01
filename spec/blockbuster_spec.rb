@@ -41,11 +41,12 @@ describe Blockbuster do
       let(:manager)      { klass.new }
       let(:my_test_dir)  { File.join(File.dirname(__FILE__), 'fixtures') }
       let(:cassette_dir) { File.join(my_test_dir, 'cassettes') }
-      let(:cassette_1)  { File.join(cassette_dir, 'match_requests_on.yml') }
-      let(:cassette_2)  { File.join(cassette_dir, 'fake_example_response.yml') }
+      let(:cassette_1)   { File.join(cassette_dir, 'match_requests_on.yml') }
+      let(:cassette_2)   { File.join(cassette_dir, 'fake_example_response.yml') }
 
       after do
         ENV['VCR_MODE'] = nil
+        FileUtils.rm_r(cassette_dir) if Dir.exist?(cassette_dir)
       end
 
       it 'does nothing if ENV["VCR_MODE"] equals "local"' do
@@ -60,7 +61,7 @@ describe Blockbuster do
       end
 
       it 'extracts cassette files' do
-        manager = klass.new(test_directory: my_test_dir, cassette_file: 'test_cassettes.tar.gz', silent: true)
+        manager = klass.new(test_directory: my_test_dir, cassette_file: 'test_cassettes.tar.gz', cassette_directory: cassette_dir, silent: true)
 
         manager.cassette_file.must_equal 'test_cassettes.tar.gz'
         manager.rent
