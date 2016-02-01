@@ -1,5 +1,3 @@
-require "blockbuster/version"
+require 'blockbuster/version'
+require 'blockbuster/manager'
 
-module Blockbuster
-  # Your code goes here...
-end
