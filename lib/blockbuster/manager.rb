@@ -40,7 +40,7 @@ module Blockbuster
     end
 
     # repackages cassettes into a compressed tarball
-    def return(force = false)
+    def return(force: false)
       if rewind? || force
         silent_puts puts "Recreating cassette file #{CASSETTE_FILE}"
         create_cassette_file
@@ -66,6 +66,12 @@ module Blockbuster
       retval.nil? ? false : retval
     end
 
+    alias setup rent
+    alias teardown return
+    alias compare rewind?
+
+    private
+
     # returns true for any differences or changes in cassette files
     def compare_cassettes(key, file)
       orig_key = comparison_hash.delete(key)
@@ -77,12 +83,6 @@ module Blockbuster
         return true
       end
     end
-
-    alias setup rent
-    alias teardown return
-    alias compare rewind?
-
-    private
 
     def key_from_path(file)
       path_array = File.dirname(file).split('/')
