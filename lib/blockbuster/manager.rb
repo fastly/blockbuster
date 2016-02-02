@@ -48,15 +48,19 @@ module Blockbuster
     # performs comparison of files
     #
     # compares the md5 sums of the files in the existing tarball
-    # and the cassettes from the cassette directory
-    def rewind?
-      files = Dir.glob("#{cassette_dir}/**/*")
-      retval = true if files.size != comparison_hash.keys.size
-      files.each do |file|
+    # and the cassettes from the cassette directory.
+    def rewind?(retval = nil)
+      Dir.glob("#{cassette_dir}/**/*").each do |file|
         key = key_from_path(file)
         comp = compare_cassettes(key, file)
         retval ||= comp
       end
+
+      if comparison_hash.keys.size > 0
+        silent_puts "Cassettes deleted: #{comparison_hash.keys}"
+        retval = true
+      end
+
       retval.nil? ? false : retval
     end
 

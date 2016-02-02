@@ -58,7 +58,7 @@ describe Blockbuster do
 
       after do
         ENV['VCR_MODE'] = nil
-        FileUtils.rm_r(cassette_dir) if Dir.exist?(cassette_dir)
+        FileUtils.rm_r(cassette_dir_path) if Dir.exist?(cassette_dir_path)
       end
 
       describe '.rent' do
@@ -114,24 +114,27 @@ describe Blockbuster do
           open(cassette_2, 'a') { |f|
             f << 'new recording'
           }
-          manager.rewind?.must_equal true
+          manager.instance_variable_set(:@silent, false)
+          proc { manager.rewind?.must_equal true }.must_output /Cassette changed: /
         end
 
         it 'returns true if no comparison_hash was created' do
           manager.comparison_hash = {}
-          manager.rewind?.must_equal true
+          manager.instance_variable_set(:@silent, false)
+          proc { manager.rewind?.must_equal true}.must_output /New cassette: /
         end
 
         it 'returns false if a file was deleted from the cassettes directory' do
           FileUtils.rm(cassette_1)
-          manager.rewind?.must_equal true
+          manager.instance_variable_set(:@silent, false)
+          proc { manager.rewind?.must_equal true}.must_output /Cassettes deleted: /
         end
 
         it 'returns false if a file was added to the cassettes directory' do
           new_cass = File.join(cassette_dir_path, 'new_cass.yml')
           FileUtils.touch(new_cass)
-          manager.rewind?.must_equal true
-          FileUtils.rm(new_cass)
+          manager.instance_variable_set(:@silent, false)
+          proc { manager.rewind?.must_equal true}.must_output /New cassette: /
         end
       end
     end
