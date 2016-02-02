@@ -1,6 +1,8 @@
 module Blockbuster
   # Manages cassette packaging and unpackaging
   class Manager
+    include Blockbuster::Packager
+
     CASSETTE_FILE      = 'vcr_cassettes.tar.gz'.freeze
     CASSETTE_DIRECTORY = 'cassettes'.freeze
     TEST_DIRECTORY     = 'test'.freeze
@@ -38,10 +40,10 @@ module Blockbuster
     end
 
     # repackages cassettes into a compressed tarball
-    def return
-      if rewind?
+    def return(force = false)
+      if rewind? || force
         silent_puts puts "Recreating cassette file #{CASSETTE_FILE}"
-        create_cassette_file if rewind
+        create_cassette_file
       end
     end
 
@@ -96,54 +98,12 @@ module Blockbuster
       File.join(test_directory, cassette_file)
     end
 
-    def create_cassette_file
-
-    end
-
-    def extract_cassettes
-      File.open(cassette_file_path, 'rb') do |file|
-        Zlib::GzipReader.wrap(file) do |gz|
-          Gem::Package::TarReader.new(gz) do |tar|
-            tar.each do |entry|
-              next unless entry.file?
-              write_file(entry)
-            end
-          end
-        end
-      end
-    end
-
-    def file_digest(file)
-      Digest::MD5.file(file).hexdigest
-    end
-
-    def read_entry_and_hash(entry)
-      contents = entry.read
-
-      comparison_hash[entry.full_name] = Digest::MD5.hexdigest(contents)
-      contents
-    end
-
     def silent?
       silent
     end
 
     def silent_puts(msg)
       puts "[Blockbuster] #{msg}" unless silent?
-    end
-
-    def write_file(entry)
-      destination = File.join test_directory, entry.full_name
-
-      contents = read_entry_and_hash(entry)
-
-      return if ENV['VCR_MODE'] == 'local'
-
-      FileUtils.mkdir_p(File.dirname(destination))
-      File.open(destination, 'wb') do |cass|
-        cass.write(contents)
-      end
-      File.chmod(entry.header.mode, destination)
     end
   end
 end

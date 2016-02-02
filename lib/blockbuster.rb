@@ -1,5 +1,7 @@
 require 'rubygems/package'
 require 'zlib'
 
-require 'blockbuster/version'
+require 'blockbuster/packager'
+
 require 'blockbuster/manager'
+require 'blockbuster/version'
