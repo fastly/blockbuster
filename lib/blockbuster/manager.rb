@@ -58,7 +58,7 @@ module Blockbuster
         retval ||= comp
       end
 
-      if !comparison_hash.keys.empty?
+      unless comparison_hash.keys.empty?
         silent_puts "Cassettes deleted: #{comparison_hash.keys}"
         retval = true
       end
