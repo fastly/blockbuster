@@ -21,6 +21,15 @@ Or install it yourself as:
 
     $ gem install blockbuster
 
+Optionally, ignore your cassettes in git and make sure to include the tar.gz file:
+
+```
+# .gitignore
+
+test/cassettes
+!test/vcr_cassettes.tar.gz
+```
+
 ## Usage
 
 #### Minitest example
@@ -58,7 +67,7 @@ If there were changes/additions/deletions to your cassette files a new tar.gz ca
 The manager constructor takes the following options:
 
 ```
-cassette_directory: string
+cassette_directory: String
   Name of directory cassette files are stored.
   Will be stored under the test directory.
   default: 'casssettes'
@@ -97,6 +106,26 @@ manager.teardown
 
 Packages cassete files into `test/vcr_cassettes.tar.gz` if `rewind?` returns true.
 Can be called with `force: true` to force it to create the cassete file.
+
+#### Recreating a cassette file
+
+If you are using automatic re-recording of cassettes Blockbuster will see the changes and create a new package.
+To skip the cassete extractiong and use the existing local cassettes you can run your tests with `VCR_MODE=local`
+
+```
+VCR_MODE=local rake test
+```
+
+You can remove a single existing cassette and run in local mode and VCR will re-record that cassette and Blockbuster will
+package a new cassettes file.
+
+#### Re-record all cassettes
+
+```
+> rm -r test/cassettes
+> rm test/vcr_cassettes.tar.gz
+> rake test
+```
 
 ## Development
 
