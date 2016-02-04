@@ -47,7 +47,7 @@ And then in an after run bock
 
 ```
 Minitest.after_run do
-  manager.return
+  manager.drop_off
 end
 ```
 
@@ -91,7 +91,7 @@ Compares the the files in `test/cassettes` to the files created during setup. Re
 if there are any changes or additions. Returns `false` if they are identical.
 
 ```
-manager.return
+manager.drop_off
 manager.teardown
 ```
 

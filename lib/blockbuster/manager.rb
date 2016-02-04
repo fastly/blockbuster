@@ -40,7 +40,7 @@ module Blockbuster
     end
 
     # repackages cassettes into a compressed tarball
-    def return(force: false)
+    def drop_off(force: false)
       if rewind? || force
         silent_puts puts "Recreating cassette file #{CASSETTE_FILE}"
         create_cassette_file
@@ -67,7 +67,7 @@ module Blockbuster
     end
 
     alias setup rent
-    alias teardown return
+    alias teardown drop_off
     alias compare rewind?
 
     private
