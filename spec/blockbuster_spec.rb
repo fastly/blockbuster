@@ -97,7 +97,7 @@ describe Blockbuster do
         end
       end
 
-      describe '.return' do
+      describe '.drop_off' do
         let(:cass)      { manager.send(:cassette_file_path) }
         let(:orig_cass) { "#{cass}.tmp" }
 
@@ -111,7 +111,7 @@ describe Blockbuster do
         end
 
         it 'does nothing if there were no changes' do
-          manager.return
+          manager.drop_off
 
           FileUtils.identical?(cass, orig_cass).must_equal true
           File.mtime(cass).must_be :==, File.mtime(orig_cass)
@@ -119,7 +119,7 @@ describe Blockbuster do
 
         it 'creates a new cassette file if force is true' do
           manager.instance_variable_set(:@silent, false)
-          proc { manager.return(force: true) }.must_output(/Recreating cassette file/)
+          proc { manager.drop_off(force: true) }.must_output(/Recreating cassette file/)
 
           File.mtime(cass).must_be :!=, File.mtime(orig_cass)
         end
@@ -129,7 +129,7 @@ describe Blockbuster do
             file << 'new recording'
           end
           manager.instance_variable_set(:@silent, false)
-          proc { manager.return(force: true) }.must_output(/Recreating cassette file/)
+          proc { manager.drop_off(force: true) }.must_output(/Recreating cassette file/)
 
           FileUtils.identical?(cass, orig_cass).must_equal false
           File.mtime(cass).must_be :!=, File.mtime(orig_cass)

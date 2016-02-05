@@ -2,6 +2,9 @@
 
 Managing your VCR cassettes since 2016.
 
+The task of this gem is to take all your VCR cassettes and package them into one `.tar.gz` file
+for adding to git or other vcs.
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -18,9 +21,111 @@ Or install it yourself as:
 
     $ gem install blockbuster
 
+Optionally, ignore your cassettes in git and make sure to include the tar.gz file:
+
+```
+# .gitignore
+
+test/cassettes
+!test/vcr_cassettes.tar.gz
+```
+
 ## Usage
 
-TODO: Write usage instructions here
+#### Minitest example
+
+Given a directory layout of:
+
+```
+-- test
+   |-- blockbuster_spec.rb
+   |-- cassettes
+   |   |-- foo.yml
+   |   `-- bar.yml
+   `-- test_helper.rb
+```
+
+In your `test_helper.rb` add
+
+```
+manager = Blockbuster.new(test_directory: File.dirname(__FILE__))
+manager.rent
+```
+
+And then in an after run bock
+
+```
+Minitest.after_run do
+  manager.drop_off
+end
+```
+
+If there were changes/additions/deletions to your cassette files a new tar.gz cassette file will be created.
+
+#### Blockbuster::Manager
+
+The manager constructor takes the following options:
+
+```
+cassette_directory: String
+  Name of directory cassette files are stored.
+  Will be stored under the test directory.
+  default: 'casssettes'
+cassette_file: String
+  name of gz cassettes file.
+  default: 'vcr_cassettes.tar.gz'
+test_directory: String
+  path to test directory where cassete file and cassetes will be stored.
+  default: 'test'
+silent: Boolean
+  Silence all output.
+  default: false
+```
+
+There are 3 public methods
+
+```
+manager.rent
+manager.setup
+```
+
+Extracts all cassettes from `test/vcr_cassettes.tar.gz` into `test/cassetes`
+
+```
+manager.rewind?
+manager.compare
+```
+
+Compares the the files in `test/cassettes` to the files created during setup. Returns `true`
+if there are any changes or additions. Returns `false` if they are identical.
+
+```
+manager.drop_off
+manager.teardown
+```
+
+Packages cassete files into `test/vcr_cassettes.tar.gz` if `rewind?` returns true.
+Can be called with `force: true` to force it to create the cassete file.
+
+#### Recreating a cassette file
+
+If you are using automatic re-recording of cassettes Blockbuster will see the changes and create a new package.
+To skip the cassete extractiong and use the existing local cassettes you can run your tests with `VCR_MODE=local`
+
+```
+VCR_MODE=local rake test
+```
+
+You can remove a single existing cassette and run in local mode and VCR will re-record that cassette and Blockbuster will
+package a new cassettes file.
+
+#### Re-record all cassettes
+
+```
+> rm -r test/cassettes
+> rm test/vcr_cassettes.tar.gz
+> rake test
+```
 
 ## Development
 
