@@ -48,7 +48,7 @@ Given a directory layout of:
 In your `test_helper.rb` add
 
 ```
-manager = Blockbuster.new(test_directory: File.dirname(__FILE__))
+manager = Blockbuster::Manager.new(test_directory: File.dirname(__FILE__))
 manager.rent
 ```
 
