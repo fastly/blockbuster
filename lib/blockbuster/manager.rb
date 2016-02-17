@@ -53,6 +53,7 @@ module Blockbuster
     # and the cassettes from the cassette directory.
     def rewind?(retval = nil)
       Dir.glob("#{cassette_dir}/**/*").each do |file|
+        next unless File.file?(file)
         key = key_from_path(file)
         comp = compare_cassettes(key, file)
         retval ||= comp
