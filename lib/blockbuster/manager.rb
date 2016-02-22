@@ -29,12 +29,12 @@ module Blockbuster
     # tracks a md5 hash of each file in the tarball
     def rent
       unless File.exist?(cassette_file_path)
-        silent_puts "[Blockbuster] File does not exist #{cassette_file_path}."
+        silent_puts "File does not exist: #{cassette_file_path}."
         return false
       end
       # return unless File.exist?(cassette_file_path)
 
-      silent_puts "[Blockbuster] Extracting VCR cassettes to #{cassette_dir}"
+      silent_puts "Extracting VCR cassettes to #{cassette_dir}"
 
       extract_cassettes
     end
@@ -42,7 +42,7 @@ module Blockbuster
     # repackages cassettes into a compressed tarball
     def drop_off(force: false)
       if rewind? || force
-        silent_puts puts "Recreating cassette file #{CASSETTE_FILE}"
+        silent_puts "Recreating cassette file #{CASSETTE_FILE}"
         create_cassette_file
       end
     end
@@ -53,8 +53,8 @@ module Blockbuster
     # and the cassettes from the cassette directory.
     def rewind?(retval = nil)
       Dir.glob("#{cassette_dir}/**/*").each do |file|
-        key = key_from_path(file)
-        comp = compare_cassettes(key, file)
+        next unless File.file?(file)
+        comp = compare_cassettes(key_from_path(file), file)
         retval ||= comp
       end
 
