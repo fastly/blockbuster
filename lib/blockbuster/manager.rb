@@ -29,7 +29,7 @@ module Blockbuster
     # tracks a md5 hash of each file in the tarball
     def rent
       unless File.exist?(cassette_file_path)
-        silent_puts "File does not exist #{cassette_file_path}."
+        silent_puts "File does not exist: #{cassette_file_path}."
         return false
       end
       # return unless File.exist?(cassette_file_path)
