@@ -47,7 +47,11 @@ Given a directory layout of:
 
 In your `test_helper.rb` add
 
+
+
 ```
+require 'blockbuster'
+
 manager = Blockbuster::Manager.new(test_directory: File.dirname(__FILE__))
 manager.rent
 ```
@@ -110,7 +114,7 @@ Can be called with `force: true` to force it to create the cassete file.
 #### Recreating a cassette file
 
 If you are using automatic re-recording of cassettes Blockbuster will see the changes and create a new package.
-To skip the cassete extractiong and use the existing local cassettes you can run your tests with `VCR_MODE=local`
+To skip the cassete extraction and use the existing local cassettes you can run your tests with `VCR_MODE=local`
 
 ```
 VCR_MODE=local rake test
