@@ -6,7 +6,7 @@ module Blockbuster
     CASSETTE_FILE      = 'vcr_cassettes.tar.gz'.freeze
     CASSETTE_DIRECTORY = 'cassettes'.freeze
     TEST_DIRECTORY     = 'test'.freeze
-    WIPE_CASSETTE_DIR  = true
+    WIPE_CASSETTE_DIR  = false
 
     attr_reader :cassette_directory, :cassette_file, :local_mode, :test_directory, :wipe_cassette_dir
     attr_accessor :comparison_hash, :silent

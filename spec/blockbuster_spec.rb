@@ -117,6 +117,7 @@ describe Blockbuster do
           end
 
           it 'wipes the existing cassette directory if wipe_cassette_dir is true' do
+            manager.instance_variable_set(:@wipe_cassette_dir, true)
             manager.wipe_cassette_dir.must_equal true
 
             manager.rent
@@ -125,6 +126,7 @@ describe Blockbuster do
           end
 
           it 'does not wipe the cassette directory if local_mode is true' do
+            manager.instance_variable_set(:@wipe_cassette_dir, true)
             manager.instance_variable_set(:@local_mode, true)
 
             manager.rent
@@ -133,8 +135,6 @@ describe Blockbuster do
           end
 
           it 'leaves the cassete directory as is if wipe_cassette_dir is false' do
-            manager.instance_variable_set(:@wipe_cassette_dir, false)
-
             manager.rent
 
             File.exist?(File.join(cassette_dir_path, 'fakefile')).must_equal true
