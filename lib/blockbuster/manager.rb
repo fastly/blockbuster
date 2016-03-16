@@ -7,8 +7,8 @@ module Blockbuster
     CASSETTE_DIRECTORY = 'cassettes'.freeze
     TEST_DIRECTORY     = 'test'.freeze
 
-    attr_reader :cassette_directory, :cassette_file, :test_directory, :silent
-    attr_accessor :comparison_hash
+    attr_reader :cassette_directory, :cassette_file, :test_directory
+    attr_accessor :comparison_hash, :silent
 
     # @param cassette_directory [String] Name of directory cassette files are stored.
     #  Will be stored under the test directory. default: 'casssettes'

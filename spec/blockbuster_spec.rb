@@ -37,6 +37,14 @@ describe Blockbuster do
         mgr.test_directory.must_equal tst_dir
       end
 
+      it 'can set @silent' do
+        mgr = klass.new(silent: true)
+        mgr.silent.must_equal true
+
+        mgr.silent = false
+        mgr.silent.must_equal false
+      end
+
       it 'initializes with an empty comparison_hash' do
         manager = klass.new
         manager.comparison_hash.must_equal({})
@@ -118,7 +126,7 @@ describe Blockbuster do
         end
 
         it 'creates a new cassette file if force is true' do
-          manager.instance_variable_set(:@silent, false)
+          manager.silent = false
           proc { manager.drop_off(force: true) }.must_output(/Recreating cassette file/)
 
           File.mtime(cass).must_be :!=, File.mtime(orig_cass)
@@ -128,7 +136,7 @@ describe Blockbuster do
           open(cassette_2, 'a') do |file|
             file << 'new recording'
           end
-          manager.instance_variable_set(:@silent, false)
+          manager.silent = false
           proc { manager.drop_off(force: true) }.must_output(/Recreating cassette file/)
 
           FileUtils.identical?(cass, orig_cass).must_equal false
@@ -149,26 +157,26 @@ describe Blockbuster do
           open(cassette_2, 'a') do |file|
             file << 'new recording'
           end
-          manager.instance_variable_set(:@silent, false)
+          manager.silent = false
           proc { manager.rewind?.must_equal true }.must_output(/Cassette changed: /)
         end
 
         it 'returns true if no comparison_hash was created' do
           manager.comparison_hash = {}
-          manager.instance_variable_set(:@silent, false)
+          manager.silent = false
           proc { manager.rewind?.must_equal true }.must_output(/New cassette: /)
         end
 
         it 'returns false if a file was deleted from the cassettes directory' do
           FileUtils.rm(cassette_1)
-          manager.instance_variable_set(:@silent, false)
+          manager.silent = false
           proc { manager.rewind?.must_equal true }.must_output(/Cassettes deleted: /)
         end
 
         it 'returns false if a file was added to the cassettes directory' do
           new_cass = File.join(cassette_dir_path, 'new_cass.yml')
           FileUtils.touch(new_cass)
-          manager.instance_variable_set(:@silent, false)
+          manager.silent = false
           proc { manager.rewind?.must_equal true }.must_output(/New cassette: /)
         end
       end
