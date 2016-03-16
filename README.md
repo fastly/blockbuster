@@ -84,6 +84,9 @@ test_directory: String
 silent: Boolean
   Silence all output.
   default: false
+wipe_cassette_dir: Boolean
+  If true, will wipe the existing cassette directory when `rent` is called.
+  default: false
 ```
 
 These are all read-only attributes with the exception of `silent`. This is writeable so that one can suppress output
@@ -97,6 +100,8 @@ manager.setup
 ```
 
 Extracts all cassettes from `test/vcr_cassettes.tar.gz` into `test/cassetes`
+directory. To wipe the existing directory before extracting cassettes
+initialize the manager with `wipe_cassette_dir: true`.
 
 ```
 manager.rewind?
@@ -125,6 +130,14 @@ VCR_MODE=local rake test
 
 You can remove a single existing cassette and run in local mode and VCR will re-record that cassette and Blockbuster will
 package a new cassettes file.
+
+#### Removing or renaming a cassette file
+
+If you rename a cassette or need to delete one from the archive you need to do the following:
+
+* Run your test suite so that you have an up-to-date cassette directory
+* Do the work to rename test/cassette etc
+* Run tests (even that single test) with `VCR_MODE=local`
 
 #### Re-record all cassettes
 

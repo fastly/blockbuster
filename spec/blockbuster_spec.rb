@@ -19,8 +19,10 @@ describe Blockbuster do
 
         manager.cassette_directory.must_equal klass::CASSETTE_DIRECTORY
         manager.cassette_file.must_equal klass::CASSETTE_FILE
+        manager.local_mode.must_equal false
         manager.test_directory.must_equal klass::TEST_DIRECTORY
         manager.silent.must_equal false
+        manager.wipe_cassette_dir.must_equal klass::WIPE_CASSETTE_DIR
       end
 
       it 'can be intialized with attributes' do
@@ -35,6 +37,9 @@ describe Blockbuster do
 
         mgr = klass.new(test_directory: tst_dir)
         mgr.test_directory.must_equal tst_dir
+
+        mgr = klass.new(wipe_cassette_dir: false)
+        mgr.wipe_cassette_dir.must_equal false
       end
 
       it 'can set @silent' do
@@ -102,6 +107,38 @@ describe Blockbuster do
 
           manager.comparison_hash.keys.must_include 'cassettes/match_requests_on.yml'
           manager.comparison_hash.keys.must_include 'cassettes/fake_example_response.yml'
+        end
+
+        describe 'wipe_cassette_dir option' do
+          before do
+            manager.cassette_file.must_equal 'test_cassettes.tar.gz'
+            manager.rent
+            FileUtils.touch(File.join(cassette_dir_path, 'fakefile'))
+          end
+
+          it 'wipes the existing cassette directory if wipe_cassette_dir is true' do
+            manager.instance_variable_set(:@wipe_cassette_dir, true)
+            manager.wipe_cassette_dir.must_equal true
+
+            manager.rent
+
+            File.exist?(File.join(cassette_dir_path, 'fakefile')).must_equal false
+          end
+
+          it 'does not wipe the cassette directory if local_mode is true' do
+            manager.instance_variable_set(:@wipe_cassette_dir, true)
+            manager.instance_variable_set(:@local_mode, true)
+
+            manager.rent
+
+            File.exist?(File.join(cassette_dir_path, 'fakefile')).must_equal true
+          end
+
+          it 'leaves the cassete directory as is if wipe_cassette_dir is false' do
+            manager.rent
+
+            File.exist?(File.join(cassette_dir_path, 'fakefile')).must_equal true
+          end
         end
       end
 

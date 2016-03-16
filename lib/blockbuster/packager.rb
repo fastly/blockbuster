@@ -58,7 +58,7 @@ module Blockbuster
 
       contents = read_entry_and_hash(entry)
 
-      return if ENV['VCR_MODE'] == 'local'
+      return if @local_mode
 
       FileUtils.mkdir_p(File.dirname(destination))
       File.open(destination, 'wb') do |cass|
