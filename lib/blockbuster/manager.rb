@@ -6,8 +6,9 @@ module Blockbuster
     CASSETTE_FILE      = 'vcr_cassettes.tar.gz'.freeze
     CASSETTE_DIRECTORY = 'cassettes'.freeze
     TEST_DIRECTORY     = 'test'.freeze
+    WIPE_CASSETTE_DIR  = true
 
-    attr_reader :cassette_directory, :cassette_file, :test_directory
+    attr_reader :cassette_directory, :cassette_file, :local_mode, :test_directory, :wipe_cassette_dir
     attr_accessor :comparison_hash, :silent
 
     # @param cassette_directory [String] Name of directory cassette files are stored.
@@ -16,12 +17,15 @@ module Blockbuster
     # @param test_directory [String] path to test directory where cassete file and cassetes will be stored.
     #  default: 'test'
     # @param silent [Boolean] Silence all output. default: false
-    def initialize(cassette_directory: CASSETTE_DIRECTORY, cassette_file: CASSETTE_FILE, test_directory: TEST_DIRECTORY, silent: false)
+    def initialize(cassette_directory: CASSETTE_DIRECTORY, cassette_file: CASSETTE_FILE, test_directory: TEST_DIRECTORY, silent: false, wipe_cassette_dir: WIPE_CASSETTE_DIR)
       @cassette_directory = cassette_directory
       @cassette_file      = cassette_file
       @test_directory     = test_directory
       @silent             = silent
       @comparison_hash    = {}
+      @wipe_cassette_dir  = wipe_cassette_dir
+
+      @local_mode = ENV['VCR_MODE'] == 'local'
     end
 
     # extracts cassettes from a tar.gz file
@@ -32,7 +36,8 @@ module Blockbuster
         silent_puts "File does not exist: #{cassette_file_path}."
         return false
       end
-      # return unless File.exist?(cassette_file_path)
+
+      remove_existing_cassette_directory if wipe_cassette_dir
 
       silent_puts "Extracting VCR cassettes to #{cassette_dir}"
 
@@ -96,6 +101,13 @@ module Blockbuster
 
     def cassette_file_path
       File.join(test_directory, cassette_file)
+    end
+
+    def remove_existing_cassette_directory
+      return if @local_mode
+
+      silent_puts "Wiping cassettes directory: #{cassette_dir}"
+      FileUtils.rm_r(cassette_dir) if Dir.exist?(cassette_dir)
     end
 
     def silent?

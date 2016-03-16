@@ -84,6 +84,9 @@ test_directory: String
 silent: Boolean
   Silence all output.
   default: false
+wipe_cassette_dir: Boolean
+  If true, will wipe the existing cassette directory on rental.
+  default: true
 ```
 
 These are all read-only attributes with the exception of `silent`. This is writeable so that one can suppress output
@@ -97,6 +100,8 @@ manager.setup
 ```
 
 Extracts all cassettes from `test/vcr_cassettes.tar.gz` into `test/cassetes`
+Before it extracts the files it will completely remove the existing cassette
+directory. To keep the existing directory initialize the manager with `wipe_cassette_dir: false`.
 
 ```
 manager.rewind?
