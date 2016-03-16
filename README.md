@@ -86,6 +86,9 @@ silent: Boolean
   default: false
 ```
 
+These are all read-only attributes with the exception of `silent`. This is writeable so that one can suppress output
+on setup but see output about new/changed cassettes upon `drop_off`.
+
 There are 3 public methods
 
 ```
