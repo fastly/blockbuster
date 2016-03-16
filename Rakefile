@@ -15,4 +15,5 @@ RuboCop::RakeTask.new do |task|
   task.fail_on_error = true
 end
 
+task spec: :test
 task default: :test
