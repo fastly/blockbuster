@@ -52,7 +52,11 @@ In your `test_helper.rb` add
 ```
 require 'blockbuster'
 
-manager = Blockbuster::Manager.new(test_directory: File.dirname(__FILE__))
+Blockbuster.configure do |c|
+  c.test_directory = File.dirname(__FILE__)
+end
+
+manager = Blockbuster::Manager.new
 manager.rent
 ```
 
@@ -66,9 +70,9 @@ end
 
 If there were changes/additions/deletions to your cassette files a new tar.gz cassette file will be created.
 
-#### Blockbuster::Manager
+#### Blockbuster.configure
 
-The manager constructor takes the following options:
+The configuration constructor takes the following options:
 
 ```
 cassette_directory: String
