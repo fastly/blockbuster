@@ -2,14 +2,19 @@ module Blockbuster
   # Manages cassette packaging and unpackaging
   class Manager
     include Blockbuster::Packager
+    extend Forwardable
 
     CASSETTE_FILE      = 'vcr_cassettes.tar.gz'.freeze
     CASSETTE_DIRECTORY = 'cassettes'.freeze
     TEST_DIRECTORY     = 'test'.freeze
     WIPE_CASSETTE_DIR  = false
 
-    attr_reader :cassette_directory, :cassette_file, :local_mode, :test_directory, :wipe_cassette_dir
-    attr_accessor :comparison_hash, :silent
+    def_delegators :configuration, :cassette_directory, :cassette_file, :local_mode, :test_directory, :silent, :wipe_cassette_dir
+    attr_accessor :comparison_hash
+
+    def configuration
+      Blockbuster.configuration
+    end
 
     # @param cassette_directory [String] Name of directory cassette files are stored.
     #  Will be stored under the test directory. default: 'casssettes'
@@ -17,15 +22,8 @@ module Blockbuster
     # @param test_directory [String] path to test directory where cassete file and cassetes will be stored.
     #  default: 'test'
     # @param silent [Boolean] Silence all output. default: false
-    def initialize(cassette_directory: CASSETTE_DIRECTORY, cassette_file: CASSETTE_FILE, test_directory: TEST_DIRECTORY, silent: false, wipe_cassette_dir: WIPE_CASSETTE_DIR)
-      @cassette_directory = cassette_directory
-      @cassette_file      = cassette_file
-      @test_directory     = test_directory
-      @silent             = silent
-      @comparison_hash    = {}
-      @wipe_cassette_dir  = wipe_cassette_dir
-
-      @local_mode = ENV['VCR_MODE'] == 'local'
+    def initialize
+      @comparison_hash = {}
     end
 
     # extracts cassettes from a tar.gz file
