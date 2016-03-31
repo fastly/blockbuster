@@ -36,7 +36,7 @@ module Blockbuster
     def read_entry_and_hash(entry)
       contents = entry.read
 
-      comparison_hash[entry.full_name] = Digest::MD5.hexdigest(contents)
+      comparison_hash.add(entry.full_name, Digest::MD5.hexdigest(contents))
       contents
     end
 

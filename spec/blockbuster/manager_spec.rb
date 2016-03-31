@@ -17,9 +17,9 @@ describe Blockbuster::Manager do
       manager.wipe_cassette_dir.must_equal Blockbuster.configuration.wipe_cassette_dir
     end
 
-    it 'initializes with an empty comparison_hash' do
+    it 'initializes with a comparison object' do
       manager = klass.new
-      manager.comparison_hash.must_equal({})
+      manager.comparison_hash.must_be_instance_of Blockbuster::Comparison
     end
   end
 
@@ -177,7 +177,7 @@ describe Blockbuster::Manager do
       end
 
       it 'returns true if no comparison_hash was created' do
-        manager.comparison_hash = {}
+        manager.comparison_hash = Blockbuster::Comparison.new
         manager.stub(:silent, false) do
           proc { manager.rewind?.must_equal true }.must_output(/New cassette: /)
         end

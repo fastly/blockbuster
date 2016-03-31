@@ -23,7 +23,7 @@ module Blockbuster
     #  default: 'test'
     # @param silent [Boolean] Silence all output. default: false
     def initialize
-      @comparison_hash = {}
+      @comparison_hash = Comparison.new
     end
 
     # extracts cassettes from a tar.gz file
@@ -61,7 +61,7 @@ module Blockbuster
         retval ||= comp
       end
 
-      unless comparison_hash.keys.empty?
+      if comparison_hash.present?
         silent_puts "Cassettes deleted: #{comparison_hash.keys}"
         retval = true
       end
