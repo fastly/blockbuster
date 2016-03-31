@@ -3,7 +3,7 @@ require 'rubygems/package'
 require 'zlib'
 
 require 'blockbuster/configuration'
-require 'blockbuster/comparison'
+require 'blockbuster/comparator'
 require 'blockbuster/packager'
 
 require 'blockbuster/manager'

@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-describe Blockbuster::Comparison do
-  let(:klass)    { Blockbuster::Comparison }
+describe Blockbuster::Comparator do
+  let(:klass)    { Blockbuster::Comparator }
   let(:instance) { klass.new }
 
   describe '#add' do

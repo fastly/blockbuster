@@ -1,6 +1,6 @@
 module Blockbuster
   # Object that holds all cassettes and their latest checksum
-  class Comparison
+  class Comparator
     def initialize
       @hash = {}
     end

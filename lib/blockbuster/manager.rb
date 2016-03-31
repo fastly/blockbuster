@@ -23,7 +23,7 @@ module Blockbuster
     #  default: 'test'
     # @param silent [Boolean] Silence all output. default: false
     def initialize
-      @comparison_hash = Comparison.new
+      @comparison_hash = Comparator.new
     end
 
     # extracts cassettes from a tar.gz file
