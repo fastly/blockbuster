@@ -8,7 +8,7 @@ module Blockbuster
     include Blockbuster::TarballHelpers
     extend Forwardable
 
-    def_delegators :configuration, :cassette_directory, :cassette_file, :local_mode, :test_directory, :silent, :wipe_cassette_dir
+    def_delegators :configuration, :cassette_directory, :master_tar_file, :local_mode, :test_directory, :silent, :wipe_cassette_dir
     attr_accessor :comparison_hash
 
     def configuration
@@ -38,7 +38,7 @@ module Blockbuster
     # repackages cassettes into a compressed tarball
     def drop_off(force: false)
       if rewind? || force
-        silent_puts "Recreating cassette file #{cassette_file}"
+        silent_puts "Recreating cassette file #{master_tar_file}"
         create_cassette_file
       end
     end

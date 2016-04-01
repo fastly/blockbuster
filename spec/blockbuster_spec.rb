@@ -6,7 +6,7 @@ describe Blockbuster do
   end
 
   let(:cassette_directory) { 'somedir' }
-  let(:cassette_file)      { 'somefile' }
+  let(:master_tar_file)    { 'somefile' }
   let(:a_test_directory)   { 'sometestdir' }
   let(:silent)             { true }
   let(:local_mode)         { false }
@@ -15,7 +15,7 @@ describe Blockbuster do
   let(:configure) do
     Blockbuster.configure do |c|
       c.cassette_directory = cassette_directory
-      c.cassette_file      = cassette_file
+      c.master_tar_file    = master_tar_file
       c.test_directory     = a_test_directory
       c.silent             = silent
       c.local_mode         = local_mode
@@ -50,7 +50,7 @@ describe Blockbuster do
 
     it 'returns actual values for configuration attributes' do
       configuration.cassette_directory.must_equal cassette_directory
-      configuration.cassette_file.must_equal cassette_file
+      configuration.master_tar_file.must_equal master_tar_file
       configuration.test_directory.must_equal a_test_directory
       configuration.silent.must_equal silent
       configuration.local_mode.must_equal local_mode
