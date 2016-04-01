@@ -2,7 +2,7 @@ module Blockbuster
   # extracts files from gzipped tarballs
   module Extractor
     def extract_cassettes
-      File.open(cassette_file_path, 'rb') do |file|
+      File.open(master_tar_file_path, 'rb') do |file|
         Zlib::GzipReader.wrap(file) do |gz|
           read_tar(gz) do |tar|
             tar.each do |entry|
