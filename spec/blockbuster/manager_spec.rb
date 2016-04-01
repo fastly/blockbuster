@@ -138,7 +138,7 @@ describe Blockbuster::Manager do
       end
 
       it 'creates a new cassette file if force is true' do
-        manager.stub(:silent, false) do
+        Blockbuster.configuration.stub(:silent?, false) do
           proc { manager.drop_off(force: true) }.must_output(/Recreating cassette file/)
         end
 
@@ -149,7 +149,7 @@ describe Blockbuster::Manager do
         open(cassette_2, 'a') do |file|
           file << 'new recording'
         end
-        manager.stub(:silent, false) do
+        Blockbuster.configuration.stub(:silent?, false) do
           proc { manager.drop_off(force: true) }.must_output(/Recreating cassette file/)
         end
 
@@ -171,21 +171,21 @@ describe Blockbuster::Manager do
         open(cassette_2, 'a') do |file|
           file << 'new recording'
         end
-        manager.stub(:silent, false) do
+        Blockbuster.configuration.stub(:silent?, false) do
           proc { manager.rewind?.must_equal true }.must_output(/Cassette changed: /)
         end
       end
 
       it 'returns true if no comparison_hash was created' do
         manager.comparison_hash = Blockbuster::Comparator.new
-        manager.stub(:silent, false) do
+        Blockbuster.configuration.stub(:silent?, false) do
           proc { manager.rewind?.must_equal true }.must_output(/New cassette: /)
         end
       end
 
       it 'returns false if a file was deleted from the cassettes directory' do
         FileUtils.rm(cassette_1)
-        manager.stub(:silent, false) do
+        Blockbuster.configuration.stub(:silent?, false) do
           proc { manager.rewind?.must_equal true }.must_output(/Cassettes deleted: /)
         end
       end
@@ -193,7 +193,7 @@ describe Blockbuster::Manager do
       it 'returns false if a file was added to the cassettes directory' do
         new_cass = File.join(cassette_dir_path, 'new_cass.yml')
         FileUtils.touch(new_cass)
-        manager.stub(:silent, false) do
+        Blockbuster.configuration.stub(:silent?, false) do
           proc { manager.rewind?.must_equal true }.must_output(/New cassette: /)
         end
       end

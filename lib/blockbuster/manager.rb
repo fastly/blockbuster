@@ -1,13 +1,12 @@
 module Blockbuster
   # Manages cassette packaging and unpackaging
   class Manager
+    include Blockbuster::Extractor
+    include Blockbuster::FileHelpers
+    include Blockbuster::OutputHelpers
     include Blockbuster::Packager
+    include Blockbuster::TarballHelpers
     extend Forwardable
-
-    CASSETTE_FILE      = 'vcr_cassettes.tar.gz'.freeze
-    CASSETTE_DIRECTORY = 'cassettes'.freeze
-    TEST_DIRECTORY     = 'test'.freeze
-    WIPE_CASSETTE_DIR  = false
 
     def_delegators :configuration, :cassette_directory, :cassette_file, :local_mode, :test_directory, :silent, :wipe_cassette_dir
     attr_accessor :comparison_hash
@@ -16,12 +15,6 @@ module Blockbuster
       Blockbuster.configuration
     end
 
-    # @param cassette_directory [String] Name of directory cassette files are stored.
-    #  Will be stored under the test directory. default: 'casssettes'
-    # @param cassette_file [String] name of gz cassettes file. default: 'vcr_cassettes.tar.gz'
-    # @param test_directory [String] path to test directory where cassete file and cassetes will be stored.
-    #  default: 'test'
-    # @param silent [Boolean] Silence all output. default: false
     def initialize
       @comparison_hash = Comparator.new
     end
@@ -45,7 +38,7 @@ module Blockbuster
     # repackages cassettes into a compressed tarball
     def drop_off(force: false)
       if rewind? || force
-        silent_puts "Recreating cassette file #{CASSETTE_FILE}"
+        silent_puts "Recreating cassette file #{cassette_file}"
         create_cassette_file
       end
     end
@@ -57,7 +50,7 @@ module Blockbuster
     def rewind?(retval = nil)
       Dir.glob("#{cassette_dir}/**/*").each do |file|
         next unless File.file?(file)
-        comp = compare_cassettes(key_from_path(file), file)
+        comp = comparison_hash.compare(key_from_path(file), file_digest(file))
         retval ||= comp
       end
 
@@ -75,45 +68,11 @@ module Blockbuster
 
     private
 
-    # returns true for any differences or changes in cassette files
-    def compare_cassettes(key, file)
-      orig_key = comparison_hash.delete(key)
-      if orig_key.nil?
-        silent_puts "New cassette: #{key}"
-        return true
-      elsif orig_key != file_digest(file)
-        silent_puts "Cassette changed: #{key}"
-        return true
-      end
-    end
-
-    def key_from_path(file)
-      path_array = File.dirname(file).split('/')
-      idx = path_array.index(cassette_directory)
-      path_array[idx..-1].push(File.basename(file)).join('/')
-    end
-
-    def cassette_dir
-      File.join(test_directory, cassette_directory)
-    end
-
-    def cassette_file_path
-      File.join(test_directory, cassette_file)
-    end
-
     def remove_existing_cassette_directory
       return if @local_mode
 
       silent_puts "Wiping cassettes directory: #{cassette_dir}"
       FileUtils.rm_r(cassette_dir) if Dir.exist?(cassette_dir)
-    end
-
-    def silent?
-      silent
-    end
-
-    def silent_puts(msg)
-      puts "[Blockbuster] #{msg}" unless silent?
     end
   end
 end
