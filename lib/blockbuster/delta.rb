@@ -22,8 +22,8 @@ module Blockbuster
 
       delta_files = files
 
-      if delta_files.empty?
-        delta_files = ["#{full_delta_directory}/#{Blockbuster.configuration.current_delta_name}"]
+      if delta_files.empty? # || delta_files not_include current_delta
+        delta_files << ["#{full_delta_directory}/#{Blockbuster.configuration.current_delta_name}"]
       end
 
       delta_files.map do |file|
