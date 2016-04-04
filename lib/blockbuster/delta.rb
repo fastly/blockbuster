@@ -51,10 +51,6 @@ module Blockbuster
       @current || false
     end
 
-    def compare?
-      !current?
-    end
-
     def file_path
       File.join(full_delta_directory, file_name)
     end

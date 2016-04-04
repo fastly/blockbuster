@@ -16,7 +16,7 @@ module Blockbuster
 
     def untar_file(entry)
       contents = entry.read
-      Blockbuster.comparator.add(entry.full_name, tar_digest(contents), file_name) if compare?
+      Blockbuster.comparator.add(entry.full_name, tar_digest(contents), file_name)
 
       save_to_disk(entry, contents) unless @local_mode
     end

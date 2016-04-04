@@ -14,9 +14,5 @@ module Blockbuster
     def file_path
       master_tar_file_path
     end
-
-    def compare?
-      true
-    end
   end
 end
