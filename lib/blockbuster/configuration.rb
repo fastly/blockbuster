@@ -53,6 +53,10 @@ module Blockbuster
 
     alias deltas_enabled? enable_deltas
 
+    def deltas_disabled?
+      !deltas_enabled?
+    end
+
     def delta_directory
       @delta_directory ||= DELTA_DIRECTORY
     end
