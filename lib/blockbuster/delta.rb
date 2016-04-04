@@ -14,13 +14,7 @@ module Blockbuster
     end
 
     def self.files
-      @files ||= begin
-                   test_dir   = Blockbuster.configuration.test_directory
-                   delta_dir  = Blockbuster.configuration.delta_directory
-                   delta_path = File.join(test_dir, delta_dir)
-
-                   Dir.glob("#{delta_path}/*.tar.gz").sort_by { |x| File.mtime(x) }
-                 end
+      @files ||= Dir.glob("#{full_delta_path}/*.tar.gz").sort_by { |x| File.mtime(x) }
     end
 
     def self.initialize_for_each
