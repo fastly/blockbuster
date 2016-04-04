@@ -10,6 +10,7 @@ require 'blockbuster/concerns/packager'
 require 'blockbuster/comparator'
 require 'blockbuster/master'
 require 'blockbuster/delta'
+require 'blockbuster/extraction_list'
 
 require 'blockbuster/manager'
 require 'blockbuster/version'
