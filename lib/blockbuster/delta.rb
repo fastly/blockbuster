@@ -14,7 +14,7 @@ module Blockbuster
     end
 
     def self.files
-      @files ||= Dir.glob("#{full_delta_path}/*.tar.gz").sort_by { |x| File.mtime(x) }
+      @files ||= Dir.glob("#{full_delta_directory}/*.tar.gz").sort_by { |x| File.mtime(x) }
     end
 
     def self.initialize_for_each
@@ -22,9 +22,9 @@ module Blockbuster
 
       delta_files = files
 
-      if delta_files.empty? # || delta_files not_include current_delta
-        delta_files << ["#{full_delta_directory}/#{Blockbuster.configuration.current_delta_name}"]
-      end
+      # If the current delta does not exist we want to add it.
+      current_delta_path = "#{full_delta_directory}/#{Blockbuster.configuration.current_delta_name}"
+      delta_files << current_delta_path unless delta_files.include?(current_delta_path)
 
       delta_files.map do |file|
         new(file)
