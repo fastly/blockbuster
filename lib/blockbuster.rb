@@ -24,4 +24,8 @@ module Blockbuster
   def self.configure
     yield configuration if block_given?
   end
+
+  def self.comparator
+    @comparator ||= Comparator.new
+  end
 end
