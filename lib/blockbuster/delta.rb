@@ -14,7 +14,7 @@ module Blockbuster
     end
 
     def self.files
-      @files ||= Dir.glob("#{full_delta_directory}/*.tar.gz").sort_by { |x| File.mtime(x) }
+      Dir.glob("#{full_delta_directory}/*.tar.gz").sort
     end
 
     def self.initialize_for_each
@@ -24,7 +24,7 @@ module Blockbuster
 
       # If the current delta does not exist we want to add it.
       current_delta_path = "#{full_delta_directory}/#{Blockbuster.configuration.current_delta_name}"
-      delta_files << current_delta_path unless delta_files.include?(current_delta_path)
+      delta_files << current_delta_path unless delta_files.grep(/#{Blockbuster.configuration.current_delta_name}/).first
 
       delta_files.map do |file|
         new(file)
@@ -41,10 +41,10 @@ module Blockbuster
     attr_reader :current, :file_name
 
     def initialize(file_name)
-      raise NotEnabledError unless Blockbuster.configuration.deltas_enabled?
+      raise NotEnabledError if Blockbuster.configuration.deltas_disabled?
 
-      @file_name = file_name
-      @current   = true if File.basename(file_name) == Blockbuster.configuration.current_delta_name
+      @file_name = File.basename(file_name)
+      @current   = true if @file_name =~ /#{Blockbuster.configuration.current_delta_name}/
     end
 
     def current
@@ -53,6 +53,10 @@ module Blockbuster
 
     def file_path
       File.join(full_delta_directory, file_name)
+    end
+
+    def target_path
+      File.join(full_delta_directory, "#{Time.now.to_i}_#{Blockbuster.configuration.current_delta_name}")
     end
 
     alias current? current

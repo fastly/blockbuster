@@ -14,5 +14,9 @@ module Blockbuster
     def file_path
       master_tar_file_path
     end
+
+    def target_path
+      master_tar_file_path
+    end
   end
 end
