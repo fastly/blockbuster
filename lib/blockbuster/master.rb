@@ -1,5 +1,22 @@
 module Blockbuster
   # Master file object
-  module Master
+  class Master
+    include Blockbuster::Extractor
+    include Blockbuster::Packager
+    include Blockbuster::FileHelpers
+
+    attr_reader :file_name
+
+    def initialize
+      @file_name = Blockbuster.configuration.master_tar_file
+    end
+
+    def file_path
+      master_tar_file_path
+    end
+
+    def compare?
+      true
+    end
   end
 end
