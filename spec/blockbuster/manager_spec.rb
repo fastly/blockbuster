@@ -1,3 +1,5 @@
+require 'spec_helper'
+
 describe Blockbuster::Manager do
   let(:klass) { Blockbuster::Manager }
 
