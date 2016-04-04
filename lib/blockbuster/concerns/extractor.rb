@@ -2,9 +2,9 @@ module Blockbuster
   # extracts files from gzipped tarballs
   module Extractor
     def extract_cassettes
-      File.open(master_tar_file_path, 'rb') do |file|
+      File.open(file_path, 'rb') do |file|
         Zlib::GzipReader.wrap(file) do |gz|
-          read_tar(gz) do |tar|
+          Gem::Package::TarReader.new(gz) do |tar|
             tar.each do |entry|
               next unless entry.file?
               untar_file(entry)
@@ -14,15 +14,21 @@ module Blockbuster
       end
     end
 
-    def files_to_extract
-      # use this to retrieve files to extract based off configuration
+    def untar_file(entry)
+      contents = entry.read
+      Blockbuster.comparator.add(entry.full_name, tar_digest(contents), file_name) if compare?
+
+      save_to_disk(entry, contents) unless @local_mode
     end
 
-    def read_entry_and_hash(entry)
-      contents = entry.read
+    def save_to_disk(entry, contents)
+      destination = File.join Blockbuster.configuration.test_directory, entry.full_name
 
-      comparison_hash.add(entry.full_name, tar_digest(contents))
-      contents
+      FileUtils.mkdir_p(File.dirname(destination))
+      File.open(destination, 'wb') do |cass|
+        cass.write(contents)
+      end
+      File.chmod(entry.header.mode, destination)
     end
   end
 end
