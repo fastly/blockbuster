@@ -1,11 +1,8 @@
 module Blockbuster
   # Manages cassette packaging and unpackaging
   class Manager
-    include Blockbuster::Extractor
     include Blockbuster::FileHelpers
     include Blockbuster::OutputHelpers
-    include Blockbuster::Packager
-    include Blockbuster::TarballHelpers
     extend Forwardable
 
     def_delegators :configuration, :cassette_directory, :master_tar_file, :local_mode, :test_directory, :silent, :wipe_cassette_dir
