@@ -7,7 +7,8 @@ module Blockbuster
 
     attr_reader :file_name
 
-    def initialize
+    def initialize(comparator)
+      @comparator = comparator
       @file_name = Blockbuster.configuration.master_tar_file
     end
 

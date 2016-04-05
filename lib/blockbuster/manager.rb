@@ -8,7 +8,8 @@ module Blockbuster
     def_delegators :configuration, :cassette_directory, :master_tar_file, :local_mode, :test_directory, :silent, :wipe_cassette_dir
 
     def initialize
-      @extraction_list = ExtractionList.new
+      @comparator = Comparator.new
+      @extraction_list = ExtractionList.new(@comparator)
     end
 
     def configuration
@@ -31,13 +32,13 @@ module Blockbuster
       @extraction_list.extract_cassettes
 
       if Blockbuster.configuration.deltas_enabled?
-        Blockbuster.comparator.store_current_delta_files
+        @comparator.store_current_delta_files
       end
     end
 
     # repackages cassettes into a compressed tarball
     def drop_off(force: false)
-      if Blockbuster.comparator.rewind?(cassette_files) || force
+      if @comparator.rewind?(cassette_files) || force
         silent_puts "Recreating cassette file #{@extraction_list.primary.file_name}"
         @extraction_list.primary.create_cassette_file
       end

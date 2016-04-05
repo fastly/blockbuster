@@ -20,7 +20,7 @@ module Blockbuster
       Dir.glob("#{full_delta_directory}/*.tar.gz").sort.map! { |file| File.basename(file)[11..-1] }
     end
 
-    def self.initialize_for_each
+    def self.initialize_for_each(comparator)
       setup_directory
 
       delta_files = files
@@ -30,7 +30,7 @@ module Blockbuster
       delta_files << current_delta unless delta_files.include?(current_delta)
 
       delta_files.map do |file|
-        new(file)
+        new(file, comparator)
       end
     end
 
@@ -43,11 +43,12 @@ module Blockbuster
 
     attr_reader :current, :file_name
 
-    def initialize(file_name)
+    def initialize(file_name, comparator)
       raise NotEnabledError if Blockbuster.configuration.deltas_disabled?
 
-      @file_name = file_name
-      @current   = true if @file_name == Blockbuster.configuration.current_delta_name
+      @comparator = comparator
+      @file_name  = file_name
+      @current    = true if @file_name == Blockbuster.configuration.current_delta_name
     end
 
     def current

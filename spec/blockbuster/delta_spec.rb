@@ -5,6 +5,7 @@ describe Blockbuster::Delta do
   let(:current_delta_name) { Blockbuster.configuration.current_delta_name }
   let(:dir)                { klass.full_delta_directory }
   let(:current_time)       { Time.now.to_i }
+  let(:comparator)         { Blockbuster::Comparator.new }
 
   describe '.files' do
     it 'returns an empty array when there are no tests' do
@@ -31,21 +32,22 @@ describe Blockbuster::Delta do
       klass.expects(:files).returns([])
       Blockbuster.configuration.expects(:deltas_disabled?).returns(false)
 
-      klass.initialize_for_each
+      klass.initialize_for_each(comparator)
     end
 
     it 'returns an array of Delta objects' do
       Blockbuster.configuration.stubs(:deltas_disabled?).returns(false)
 
-      klass.initialize_for_each.must_be_instance_of Array
-      klass.initialize_for_each[0].must_be_instance_of klass
+      response = klass.initialize_for_each(comparator)
+      response.must_be_instance_of Array
+      response[0].must_be_instance_of klass
     end
 
     it 'if there are no deltas the array includes the current delta' do
       FileUtils.rm Dir.glob("#{dir}/*.tar.gz")
       Blockbuster.configuration.stubs(:deltas_disabled?).returns(false)
 
-      deltas = klass.initialize_for_each
+      deltas = klass.initialize_for_each(comparator)
       deltas.size.must_equal 1
       deltas[0].current?.must_equal true
       deltas[0].file_path.must_equal "#{dir}/#{current_delta_name}"
@@ -69,13 +71,13 @@ describe Blockbuster::Delta do
     end
   end
 
-  let(:delta) { klass.new(current_delta_name) }
+  let(:delta) { klass.new(current_delta_name, comparator) }
 
   describe '#initialize' do
     it 'raises NotEnabledError if deltas are not enabled' do
       Blockbuster.configuration.stubs(:deltas_disabled?).returns(true)
 
-      proc { klass.new('') }.must_raise klass::NotEnabledError
+      proc { klass.new('', comparator) }.must_raise klass::NotEnabledError
     end
 
     it 'sets @current to true if it is the current delta using a fuzzy match' do
@@ -87,7 +89,7 @@ describe Blockbuster::Delta do
     it 'sets @current to false if is not the current delta' do
       Blockbuster.configuration.stubs(:deltas_disabled?).returns(false)
 
-      not_current = klass.new('not_current_delta.tar.gz')
+      not_current = klass.new('not_current_delta.tar.gz', comparator)
       not_current.current?.must_equal false
     end
 

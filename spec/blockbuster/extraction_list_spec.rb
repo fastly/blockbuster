@@ -1,8 +1,9 @@
 require 'spec_helper'
 
 describe Blockbuster::ExtractionList do
-  let(:klass)    { Blockbuster::ExtractionList }
-  let(:instance) { klass.new }
+  let(:klass)      { Blockbuster::ExtractionList }
+  let(:comparator) { Blockbuster::Comparator.new }
+  let(:instance)   { klass.new(comparator) }
 
   describe '#files' do
     it 'returns an array with the first element as a Blockbuster::Master' do
@@ -25,8 +26,8 @@ describe Blockbuster::ExtractionList do
   end
 
   describe 'deltas enabled' do
-    let(:delta_one) { Blockbuster::Delta.new('delta_one') }
-    let(:delta_two) { Blockbuster::Delta.new('delta_two') }
+    let(:delta_one) { Blockbuster::Delta.new('delta_one', comparator) }
+    let(:delta_two) { Blockbuster::Delta.new('delta_two', comparator) }
 
     before do
       Blockbuster.configuration.stubs(:deltas_enabled?).returns(true)
@@ -69,13 +70,13 @@ describe Blockbuster::ExtractionList do
 
       describe '#primary' do
         it 'returns master if no master file exists' do
-          File.stubs(:exist?).with(Blockbuster::Master.new.file_path).returns(false)
+          File.stubs(:exist?).with(Blockbuster::Master.new(comparator).file_path).returns(false)
 
           instance.primary.must_be_instance_of Blockbuster::Master
         end
 
         it 'returns the current delta' do
-          File.exist?(Blockbuster::Master.new.file_path).must_equal true
+          File.exist?(Blockbuster::Master.new(comparator).file_path).must_equal true
 
           primary = instance.primary
           primary.must_be_instance_of Blockbuster::Delta

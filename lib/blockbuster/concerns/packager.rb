@@ -18,7 +18,7 @@ module Blockbuster
       rel_path = key_from_path(file)
 
       if Blockbuster.configuration.deltas_enabled?
-        return unless Blockbuster.comparator.edited?(rel_path)
+        return unless @comparator.edited?(rel_path)
       end
 
       write_to_disk(tar, file)

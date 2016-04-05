@@ -3,7 +3,8 @@ module Blockbuster
   class ExtractionList
     attr_reader :files
 
-    def initialize
+    def initialize(comparator)
+      @comparator = comparator
       list = [master]
 
       list << deltas if Blockbuster.configuration.deltas_enabled?
@@ -16,7 +17,7 @@ module Blockbuster
     end
 
     def deltas
-      @deltas ||= Delta.initialize_for_each
+      @deltas ||= Delta.initialize_for_each(@comparator)
     end
 
     def extract_cassettes
@@ -24,7 +25,7 @@ module Blockbuster
     end
 
     def master
-      @master ||= Master.new
+      @master ||= Master.new(@comparator)
     end
 
     # determines what file representation to return for writing to
