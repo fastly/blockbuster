@@ -1,10 +1,12 @@
 module Blockbuster
   # Object that holds all cassettes and their latest checksum
   class Comparator
-    include Blockbuster::FileHelpers
     include Blockbuster::OutputHelpers
 
-    def initialize
+    attr_reader :configuration
+
+    def initialize(configuration)
+      @configuration = configuration
       @hash = {}
 
       @edited              = []
@@ -46,7 +48,7 @@ module Blockbuster
 
     def store_current_delta_files
       @hash.each do |k, v|
-        @current_delta_files << k if v['source'] == Blockbuster.configuration.current_delta_name
+        @current_delta_files << k if v['source'] == configuration.current_delta_name
       end
     end
 
@@ -55,11 +57,11 @@ module Blockbuster
     def rewind?(files)
       files.each do |file|
         next unless File.file?(file)
-        key = key_from_path(file)
-        @edited << key if compare(key, file_digest(file))
+        key = configuration.key_from_path(file)
+        @edited << key if compare(key, configuration.file_digest(file))
       end
 
-      if present? && Blockbuster.configuration.deltas_disabled?
+      if present? && configuration.deltas_disabled?
         silent_puts "Cassettes deleted: #{keys}"
         return true
       end

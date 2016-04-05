@@ -16,13 +16,13 @@ module Blockbuster
 
     def untar_file(entry)
       contents = entry.read
-      @comparator.add(entry.full_name, tar_digest(contents), file_name)
+      @comparator.add(entry.full_name, configuration.tar_digest(contents), file_name)
 
       save_to_disk(entry, contents) unless @local_mode
     end
 
     def save_to_disk(entry, contents)
-      destination = File.join Blockbuster.configuration.test_directory, entry.full_name
+      destination = File.join configuration.test_directory, entry.full_name
 
       FileUtils.mkdir_p(File.dirname(destination))
       File.open(destination, 'wb') do |cass|

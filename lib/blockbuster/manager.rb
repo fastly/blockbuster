@@ -1,19 +1,22 @@
 module Blockbuster
   # Manages cassette packaging and unpackaging
   class Manager
-    include Blockbuster::FileHelpers
     include Blockbuster::OutputHelpers
     extend Forwardable
 
-    def_delegators :configuration, :cassette_directory, :master_tar_file, :local_mode, :test_directory, :silent, :wipe_cassette_dir
+    # def_delegators :configuration, :cassette_directory, :master_tar_file, :local_mode, :test_directory, :silent, :wipe_cassette_dir
 
-    def initialize
-      @comparator = Comparator.new
-      @extraction_list = ExtractionList.new(@comparator)
+    def initialize(local_configuration = Blockbuster::Configuration.new)
+      yield configuration if block_given?
+
+      @configuration ||= local_configuration
+
+      @comparator = Comparator.new(@configuration)
+      @extraction_list = ExtractionList.new(@comparator, @configuration)
     end
 
     def configuration
-      Blockbuster.configuration
+      @configuration ||= Blockbuster::Configuration.new
     end
 
     # extracts cassettes from a tar.gz file
@@ -27,18 +30,18 @@ module Blockbuster
 
       remove_existing_cassette_directory if configuration.wipe_cassette_dir
 
-      silent_puts "Extracting VCR cassettes to #{cassette_dir}"
+      silent_puts "Extracting VCR cassettes to #{configuration.cassette_dir}"
 
       @extraction_list.extract_cassettes
 
-      if Blockbuster.configuration.deltas_enabled?
+      if configuration.deltas_enabled?
         @comparator.store_current_delta_files
       end
     end
 
     # repackages cassettes into a compressed tarball
     def drop_off(force: false)
-      if @comparator.rewind?(cassette_files) || force
+      if @comparator.rewind?(configuration.cassette_files) || force
         silent_puts "Recreating cassette file #{@extraction_list.primary.file_name}"
         @extraction_list.primary.create_cassette_file
       end
@@ -50,10 +53,10 @@ module Blockbuster
     private
 
     def remove_existing_cassette_directory
-      return if Blockbuster.configuration.local_mode
+      return if configuration.local_mode
 
-      silent_puts "Wiping cassettes directory: #{cassette_dir}"
-      FileUtils.rm_r(cassette_dir) if Dir.exist?(cassette_dir)
+      silent_puts "Wiping cassettes directory: #{configuration.cassette_dir}"
+      FileUtils.rm_r(configuration.cassette_dir) if Dir.exist?(configuration.cassette_dir)
     end
   end
 end

@@ -1,6 +1,8 @@
 module Blockbuster
   # Manages blockbuster configuration
   class Configuration
+    include Blockbuster::FileHelpers
+
     MASTER_TAR_FILE    = 'vcr_cassettes.tar.gz'.freeze
     CASSETTE_DIRECTORY = 'cassettes'.freeze
     TEST_DIRECTORY     = 'test'.freeze

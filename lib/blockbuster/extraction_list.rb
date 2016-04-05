@@ -1,13 +1,14 @@
 module Blockbuster
   # generates an ordered collection of files to extract
   class ExtractionList
-    attr_reader :files
+    attr_reader :files, :configuration
 
-    def initialize(comparator)
+    def initialize(comparator, configuration)
+      @configuration = configuration
       @comparator = comparator
       list = [master]
 
-      list << deltas if Blockbuster.configuration.deltas_enabled?
+      list << deltas if configuration.deltas_enabled?
 
       @files = list.flatten
     end
@@ -17,7 +18,7 @@ module Blockbuster
     end
 
     def deltas
-      @deltas ||= Delta.initialize_for_each(@comparator)
+      @deltas ||= Delta.initialize_for_each(@comparator, configuration)
     end
 
     def extract_cassettes
@@ -25,7 +26,7 @@ module Blockbuster
     end
 
     def master
-      @master ||= Master.new(@comparator)
+      @master ||= Master.new(@comparator, configuration)
     end
 
     # determines what file representation to return for writing to
@@ -39,7 +40,7 @@ module Blockbuster
     #
     # 3.  current_delta
     def primary
-      return master if Blockbuster.configuration.deltas_disabled?
+      return master if configuration.deltas_disabled?
 
       return master unless File.exist?(master.file_path)
 

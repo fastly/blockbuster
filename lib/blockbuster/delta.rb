@@ -3,8 +3,6 @@ module Blockbuster
   class Delta
     include Blockbuster::Extractor
     include Blockbuster::Packager
-    include Blockbuster::FileHelpers
-    extend Blockbuster::FileHelpers
 
     # nodoc
     class NotEnabledError < StandardError
@@ -16,39 +14,40 @@ module Blockbuster
     # Dir.glob returns the full path for a file, dir/time_delta_name.tar.gz, so we strip out
     # the directory path and then drop the first 11 characters (epoch time + _) to get the delta
     # tar name. This will break in the 2200s because epoch will be 11 characters instead of 10.
-    def self.files
-      Dir.glob("#{full_delta_directory}/*.tar.gz").sort.map! { |file| File.basename(file)[11..-1] }
+    def self.files(directory)
+      Dir.glob("#{directory}/*.tar.gz").sort.map! { |file| File.basename(file)[11..-1] }
     end
 
-    def self.initialize_for_each(comparator)
-      setup_directory
+    def self.initialize_for_each(comparator, configuration)
+      setup_directory(configuration.full_delta_directory)
 
-      delta_files = files
+      delta_files = files(configuration.full_delta_directory)
 
       # If the current delta does not exist we want to add it.
-      current_delta = Blockbuster.configuration.current_delta_name
+      current_delta = configuration.current_delta_name
       delta_files << current_delta unless delta_files.include?(current_delta)
 
       delta_files.map do |file|
-        new(file, comparator)
+        new(file, comparator, configuration)
       end
     end
 
-    def self.setup_directory
-      return if Dir.exist?(full_delta_directory)
+    def self.setup_directory(directory)
+      return if Dir.exist?(directory)
 
-      FileUtils.mkdir_p(full_delta_directory)
-      FileUtils.touch("#{full_delta_directory}/.keep")
+      FileUtils.mkdir_p(directory)
+      FileUtils.touch("#{directory}/.keep")
     end
 
-    attr_reader :current, :file_name
+    attr_reader :current, :file_name, :configuration
 
-    def initialize(file_name, comparator)
-      raise NotEnabledError if Blockbuster.configuration.deltas_disabled?
+    def initialize(file_name, comparator, configuration)
+      raise NotEnabledError if configuration.deltas_disabled?
 
+      @configuration = configuration
       @comparator = comparator
       @file_name  = file_name
-      @current    = true if @file_name == Blockbuster.configuration.current_delta_name
+      @current    = true if @file_name == @configuration.current_delta_name
     end
 
     def current
@@ -56,11 +55,11 @@ module Blockbuster
     end
 
     def file_path
-      File.join(full_delta_directory, file_name)
+      File.join(configuration.full_delta_directory, file_name)
     end
 
     def target_path
-      File.join(full_delta_directory, "#{Time.now.to_i}_#{Blockbuster.configuration.current_delta_name}")
+      File.join(configuration.full_delta_directory, "#{Time.now.to_i}_#{configuration.current_delta_name}")
     end
 
     alias current? current

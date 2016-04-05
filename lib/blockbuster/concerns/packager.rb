@@ -6,7 +6,7 @@ module Blockbuster
       File.open(target_path, 'wb') do |file|
         Zlib::GzipWriter.wrap(file) do |gz|
           Gem::Package::TarWriter.new(gz) do |tar|
-            cassette_files.each do |cass|
+            configuration.cassette_files.each do |cass|
               tar_file(tar, cass)
             end
           end
@@ -15,9 +15,9 @@ module Blockbuster
     end
 
     def tar_file(tar, file)
-      rel_path = key_from_path(file)
+      rel_path = configuration.key_from_path(file)
 
-      if Blockbuster.configuration.deltas_enabled?
+      if configuration.deltas_enabled?
         return unless @comparator.edited?(rel_path)
       end
 
@@ -26,7 +26,7 @@ module Blockbuster
 
     def write_to_disk(tar, file)
       mode     = File.stat(file).mode
-      rel_path = key_from_path(file)
+      rel_path = configuration.key_from_path(file)
 
       if File.directory?(file)
         tar.mkdir rel_path, mode

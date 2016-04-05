@@ -1,8 +1,9 @@
 require 'spec_helper'
 
 describe Blockbuster::Comparator do
+  let(:config)   { Blockbuster::Configuration.new }
   let(:klass)    { Blockbuster::Comparator }
-  let(:instance) { klass.new }
+  let(:instance) { klass.new(config) }
 
   describe '#add' do
     it 'adds the given key and value to the comparison object' do
@@ -90,7 +91,7 @@ describe Blockbuster::Comparator do
   describe '#store_current_delta_files' do
     it 'does not add files to current_delta_files list if `source` != `current_delta_name`' do
       source_name = 'blah'
-      source_name.wont_equal Blockbuster.configuration.current_delta_name
+      source_name.wont_equal config.current_delta_name
 
       instance.add('a', 'b', source_name)
 
@@ -100,7 +101,7 @@ describe Blockbuster::Comparator do
     end
 
     it 'adds files to current_delta_files list if `source` == `current_delta_name' do
-      instance.add('a', 'b', Blockbuster.configuration.current_delta_name)
+      instance.add('a', 'b', config.current_delta_name)
 
       instance.store_current_delta_files
 
@@ -112,7 +113,7 @@ describe Blockbuster::Comparator do
     it 'returns true if there are keys present and deltas are disabled' do
       instance.add('a', 'b', 'c')
       instance.present?.must_equal true
-      Blockbuster.configuration.deltas_disabled?.must_equal true
+      config.deltas_disabled?.must_equal true
 
       instance.rewind?([]).must_equal true
     end
