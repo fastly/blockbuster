@@ -9,7 +9,7 @@ module Blockbuster
 
     def initialize
       @comparator = Comparator.new
-      @extraction_list = ExtractionList.new(@comparator)
+      @extraction_list = ExtractionList.new(@comparator, configuration)
     end
 
     def configuration
@@ -27,11 +27,11 @@ module Blockbuster
 
       remove_existing_cassette_directory if configuration.wipe_cassette_dir
 
-      silent_puts "Extracting VCR cassettes to #{cassette_dir}"
+      silent_puts "Extracting VCR cassettes to #{File.join(@config_object.test_directory, @config_object.cassette_directory)}"
 
       @extraction_list.extract_cassettes
 
-      if Blockbuster.configuration.deltas_enabled?
+      if configuration.deltas_enabled?
         @comparator.store_current_delta_files
       end
     end
@@ -50,10 +50,14 @@ module Blockbuster
     private
 
     def remove_existing_cassette_directory
-      return if Blockbuster.configuration.local_mode
+      return if configuration.local_mode
 
       silent_puts "Wiping cassettes directory: #{cassette_dir}"
       FileUtils.rm_r(cassette_dir) if Dir.exist?(cassette_dir)
+    end
+
+    def cassette_dir
+      File.join(configuration.test_directory, configuration.cassette_directory)
     end
   end
 end

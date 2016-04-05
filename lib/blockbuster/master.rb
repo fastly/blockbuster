@@ -1,15 +1,17 @@
 module Blockbuster
   # Master file object
-  class Master
+  class Master < Package
     include Blockbuster::Extractor
     include Blockbuster::Packager
     include Blockbuster::FileHelpers
 
     attr_reader :file_name
 
-    def initialize(comparator)
+    def initialize(comparator, config)
       @comparator = comparator
-      @file_name = Blockbuster.configuration.master_tar_file
+      @file_name  = config.master_tar_file
+
+      super(config)
     end
 
     def file_path

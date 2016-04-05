@@ -14,21 +14,5 @@ module Blockbuster
     def tar_digest(content)
       Digest::MD5.hexdigest(content)
     end
-
-    def cassette_dir
-      File.join(Blockbuster.configuration.test_directory, Blockbuster.configuration.cassette_directory)
-    end
-
-    def master_tar_file_path
-      File.join(Blockbuster.configuration.test_directory, Blockbuster.configuration.master_tar_file)
-    end
-
-    def full_delta_directory
-      File.join(Blockbuster.configuration.test_directory, Blockbuster.configuration.delta_directory)
-    end
-
-    def cassette_files
-      Dir.glob("#{cassette_dir}/**/*")
-    end
   end
 end

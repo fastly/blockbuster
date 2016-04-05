@@ -1,6 +1,6 @@
 module Blockbuster
   # Delta file objects
-  class Delta
+  class Delta < Package
     include Blockbuster::Extractor
     include Blockbuster::Packager
     include Blockbuster::FileHelpers
@@ -20,35 +20,37 @@ module Blockbuster
       Dir.glob("#{full_delta_directory}/*.tar.gz").sort.map! { |file| File.basename(file)[11..-1] }
     end
 
-    def self.initialize_for_each(comparator)
-      setup_directory
+    def self.initialize_for_each(comparator, config)
+      delta_dir_path = File.join(config.test_directory, config.delta_directory)
+      setup_directory(delta_dir_path)
 
       delta_files = files
 
       # If the current delta does not exist we want to add it.
-      current_delta = Blockbuster.configuration.current_delta_name
-      delta_files << current_delta unless delta_files.include?(current_delta)
+      delta_files << config.current_delta_name unless delta_files.include?(config.current_delta_name)
 
       delta_files.map do |file|
-        new(file, comparator)
+        new(file, comparator, config)
       end
     end
 
-    def self.setup_directory
-      return if Dir.exist?(full_delta_directory)
+    def self.setup_directory(dir)
+      return if Dir.exist?(dir)
 
-      FileUtils.mkdir_p(full_delta_directory)
-      FileUtils.touch("#{full_delta_directory}/.keep")
+      FileUtils.mkdir_p(dir)
+      FileUtils.touch("#{dir}/.keep")
     end
 
     attr_reader :current, :file_name
 
-    def initialize(file_name, comparator)
-      raise NotEnabledError if Blockbuster.configuration.deltas_disabled?
+    def initialize(file_name, comparator, config)
+      @current_delta_name = config.current_delta_name
 
       @comparator = comparator
       @file_name  = file_name
-      @current    = true if @file_name == Blockbuster.configuration.current_delta_name
+      @current    = true if @file_name == config.current_delta_name
+
+      super(config)
     end
 
     def current
@@ -60,7 +62,7 @@ module Blockbuster
     end
 
     def target_path
-      File.join(full_delta_directory, "#{Time.now.to_i}_#{Blockbuster.configuration.current_delta_name}")
+      File.join(full_delta_directory, "#{Time.now.to_i}_#{@current_delta_name}")
     end
 
     alias current? current

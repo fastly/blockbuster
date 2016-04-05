@@ -100,7 +100,7 @@ describe Blockbuster::Comparator do
     end
 
     it 'adds files to current_delta_files list if `source` == `current_delta_name' do
-      instance.add('a', 'b', Blockbuster.configuration.current_delta_name)
+      instance.add('a', 'b', Blockbuster.configuration.current_delta_name, true)
 
       instance.store_current_delta_files
 

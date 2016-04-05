@@ -11,8 +11,8 @@ module Blockbuster
       @current_delta_files = []
     end
 
-    def add(key, value, source)
-      @hash[key] = { 'content' => value, 'source' => source }
+    def add(key, value, source, primary = false)
+      @hash[key] = { 'content' => value, 'source' => source, 'primary' => primary }
     end
 
     def delete(key)
@@ -46,7 +46,7 @@ module Blockbuster
 
     def store_current_delta_files
       @hash.each do |k, v|
-        @current_delta_files << k if v['source'] == Blockbuster.configuration.current_delta_name
+        @current_delta_files << k if v['primary'] == true
       end
     end
 

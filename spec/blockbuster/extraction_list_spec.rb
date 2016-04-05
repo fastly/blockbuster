@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Blockbuster::ExtractionList do
   let(:klass)      { Blockbuster::ExtractionList }
   let(:comparator) { Blockbuster::Comparator.new }
-  let(:instance)   { klass.new(comparator) }
+  let(:instance)   { klass.new(comparator, false) }
 
   describe '#files' do
     it 'returns an array with the first element as a Blockbuster::Master' do
@@ -30,7 +30,8 @@ describe Blockbuster::ExtractionList do
     let(:delta_two) { Blockbuster::Delta.new('delta_two', comparator) }
 
     before do
-      Blockbuster.configuration.stubs(:deltas_enabled?).returns(true)
+      Blockbuster.configuration.stubs(:deltas_disabled?).returns(false)
+      instance.instance_variable_set(:@delta_enabled, true)
     end
 
     describe '#files' do

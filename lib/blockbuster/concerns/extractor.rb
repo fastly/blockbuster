@@ -16,7 +16,9 @@ module Blockbuster
 
     def untar_file(entry)
       contents = entry.read
-      @comparator.add(entry.full_name, tar_digest(contents), file_name)
+
+      is_primary = self.instance_of?(Blockbuster::Master) || current?
+      @comparator.add(entry.full_name, tar_digest(contents), file_name, is_primary)
 
       save_to_disk(entry, contents) unless @local_mode
     end
