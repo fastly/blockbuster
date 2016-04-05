@@ -12,7 +12,7 @@ module Blockbuster
     it 'has configuration attributes' do
       attrs = [
         :cassette_directory,
-        :cassette_file,
+        :master_tar_file,
         :local_mode,
         :test_directory,
         :wipe_cassette_dir,
@@ -36,15 +36,15 @@ module Blockbuster
       end
     end
 
-    describe '#cassette_file' do
-      it 'defaults to CASSETTE_FILE' do
-        configuration.cassette_file.must_equal klass::CASSETTE_FILE
+    describe '#master_tar_file' do
+      it 'defaults to MASTER_TAR_FILE' do
+        configuration.master_tar_file.must_equal klass::MASTER_TAR_FILE
       end
 
       it 'returns assigned value' do
-        configuration.cassette_file = 'somefile'
+        configuration.master_tar_file = 'somefile'
 
-        configuration.cassette_file.must_equal 'somefile'
+        configuration.master_tar_file.must_equal 'somefile'
       end
     end
 
