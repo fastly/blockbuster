@@ -20,13 +20,13 @@ describe Blockbuster::Delta do
       FileUtils.touch("#{dir}/#{current_time - 20}_b.tar.gz")
       FileUtils.touch("#{dir}/#{current_time - 10}_a.tar.gz")
 
-      klass.files.must_equal ["c.tar.gz", "b.tar.gz", "a.tar.gz"]
+      klass.files.must_equal ['c.tar.gz', 'b.tar.gz', 'a.tar.gz']
     end
   end
 
   describe '.initialize_for_each' do
     it 'calls .setup_directory and .files once' do
-      FileUtils.rm Dir.glob("#{dir}/*.tar.gz")    
+      FileUtils.rm Dir.glob("#{dir}/*.tar.gz")
       klass.expects(:setup_directory)
       klass.expects(:files).returns([])
       Blockbuster.configuration.expects(:deltas_disabled?).returns(false)
@@ -42,7 +42,7 @@ describe Blockbuster::Delta do
     end
 
     it 'if there are no deltas the array includes the current delta' do
-      FileUtils.rm Dir.glob("#{dir}/*.tar.gz")    
+      FileUtils.rm Dir.glob("#{dir}/*.tar.gz")
       Blockbuster.configuration.stubs(:deltas_disabled?).returns(false)
 
       deltas = klass.initialize_for_each
@@ -69,7 +69,7 @@ describe Blockbuster::Delta do
     end
   end
 
-  let(:delta) { klass.new("#{current_delta_name}") }
+  let(:delta) { klass.new(current_delta_name) }
 
   describe '#initialize' do
     it 'raises NotEnabledError if deltas are not enabled' do
@@ -87,32 +87,32 @@ describe Blockbuster::Delta do
     it 'sets @current to false if is not the current delta' do
       Blockbuster.configuration.stubs(:deltas_disabled?).returns(false)
 
-      not_current = klass.new("not_current_delta.tar.gz")
+      not_current = klass.new('not_current_delta.tar.gz')
       not_current.current?.must_equal false
     end
 
     it 'the filename does not include the path' do
       Blockbuster.configuration.stubs(:deltas_disabled?).returns(false)
 
-      delta.file_name.must_equal "#{current_delta_name}"
+      delta.file_name.must_equal current_delta_name
     end
   end
 
   describe '#file_path' do
     it 'is the delta director + filename' do
-    Blockbuster.configuration.stubs(:deltas_disabled?).returns(false)
+      Blockbuster.configuration.stubs(:deltas_disabled?).returns(false)
 
-    delta.file_path.must_equal "#{dir}/#{current_delta_name}"
+      delta.file_path.must_equal "#{dir}/#{current_delta_name}"
     end
   end
 
   describe '#target_path' do
     it 'is the director + the delta name prefixed with the current time in epoch format' do
-    Blockbuster.configuration.stubs(:deltas_disabled?).returns(false)
+      Blockbuster.configuration.stubs(:deltas_disabled?).returns(false)
 
-    current_time
-    Time.expects(:now).returns(current_time + 100)
-    delta.target_path.must_equal "#{dir}/#{current_time+100}_#{current_delta_name}"
+      current_time
+      Time.expects(:now).returns(current_time + 100)
+      delta.target_path.must_equal "#{dir}/#{current_time + 100}_#{current_delta_name}"
     end
   end
 end
