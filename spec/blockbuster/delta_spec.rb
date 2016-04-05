@@ -20,9 +20,7 @@ describe Blockbuster::Delta do
       FileUtils.touch("#{dir}/#{current_time - 20}_b.tar.gz")
       FileUtils.touch("#{dir}/#{current_time - 10}_a.tar.gz")
 
-      klass.files.must_equal ["#{dir}/#{current_time - 30}_c.tar.gz",
-                              "#{dir}/#{current_time - 20}_b.tar.gz",
-                              "#{dir}/#{current_time - 10}_a.tar.gz"]
+      klass.files.must_equal ["c.tar.gz", "b.tar.gz", "a.tar.gz"]
     end
   end
 
@@ -71,7 +69,7 @@ describe Blockbuster::Delta do
     end
   end
 
-  let(:delta) { klass.new("#{dir}/#{current_time}_#{current_delta_name}") }
+  let(:delta) { klass.new("#{current_delta_name}") }
 
   describe '#initialize' do
     it 'raises NotEnabledError if deltas are not enabled' do
@@ -86,10 +84,17 @@ describe Blockbuster::Delta do
       delta.current?.must_equal true
     end
 
+    it 'sets @current to false if is not the current delta' do
+      Blockbuster.configuration.stubs(:deltas_disabled?).returns(false)
+
+      not_current = klass.new("not_current_delta.tar.gz")
+      not_current.current?.must_equal false
+    end
+
     it 'the filename does not include the path' do
       Blockbuster.configuration.stubs(:deltas_disabled?).returns(false)
 
-      delta.file_name.must_equal "#{current_time}_#{current_delta_name}"
+      delta.file_name.must_equal "#{current_delta_name}"
     end
   end
 
@@ -97,7 +102,7 @@ describe Blockbuster::Delta do
     it 'is the delta director + filename' do
     Blockbuster.configuration.stubs(:deltas_disabled?).returns(false)
 
-    delta.file_path.must_equal "#{dir}/#{current_time}_#{current_delta_name}"
+    delta.file_path.must_equal "#{dir}/#{current_delta_name}"
     end
   end
 
@@ -106,8 +111,8 @@ describe Blockbuster::Delta do
     Blockbuster.configuration.stubs(:deltas_disabled?).returns(false)
 
     current_time
-    Time.expects(:now).returns(current_time)
-    delta.target_path.must_equal "#{dir}/#{current_time}_#{current_delta_name}"
+    Time.expects(:now).returns(current_time + 100)
+    delta.target_path.must_equal "#{dir}/#{current_time+100}_#{current_delta_name}"
     end
   end
 end

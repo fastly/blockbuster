@@ -13,8 +13,11 @@ module Blockbuster
       end
     end
 
+    # Dir.glob returns the full path for a file, dir/time_delta_name.tar.gz, so we strip out
+    # the directory path and then drop the first 11 characters (epoch time + _) to get the delta
+    # tar name. This will break in the 2200s because epoch will be 11 characters instead of 10.
     def self.files
-      Dir.glob("#{full_delta_directory}/*.tar.gz").sort
+      Dir.glob("#{full_delta_directory}/*.tar.gz").sort.map! { |file| File.basename(file)[11..-1] }
     end
 
     def self.initialize_for_each
@@ -23,8 +26,8 @@ module Blockbuster
       delta_files = files
 
       # If the current delta does not exist we want to add it.
-      current_delta_path = "#{full_delta_directory}/#{Blockbuster.configuration.current_delta_name}"
-      delta_files << current_delta_path unless delta_files.grep(/#{Blockbuster.configuration.current_delta_name}/).first
+      current_delta = Blockbuster.configuration.current_delta_name
+      delta_files << current_delta unless delta_files.include?(current_delta)
 
       delta_files.map do |file|
         new(file)
@@ -43,8 +46,8 @@ module Blockbuster
     def initialize(file_name)
       raise NotEnabledError if Blockbuster.configuration.deltas_disabled?
 
-      @file_name = File.basename(file_name)
-      @current   = true if @file_name =~ /#{Blockbuster.configuration.current_delta_name}/
+      @file_name = file_name
+      @current   = true if @file_name == Blockbuster.configuration.current_delta_name
     end
 
     def current
