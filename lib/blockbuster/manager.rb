@@ -34,9 +34,7 @@ module Blockbuster
 
       @extraction_list.extract_cassettes
 
-      if configuration.deltas_enabled?
-        @comparator.store_current_delta_files
-      end
+      @comparator.store_current_delta_files if configuration.deltas_enabled?
     end
 
     # repackages cassettes into a compressed tarball

@@ -21,7 +21,7 @@ describe Blockbuster::Manager do
     let(:cassette_dir_path) { File.join(my_test_dir, 'cassettes') }
     let(:cassette_1)        { File.join(cassette_dir_path, 'match_requests_on.yml') }
     let(:cassette_2)        { File.join(cassette_dir_path, 'fake_example_response.yml') }
-    let(:configuration)      { manager.configuration }
+    let(:configuration)     { manager.configuration }
     let(:manager) do
       klass.new do |c|
         c.test_directory = my_test_dir

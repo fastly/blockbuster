@@ -2,9 +2,9 @@ require 'spec_helper'
 
 describe Blockbuster::ExtractionList do
   let(:configuration)     { Blockbuster::Configuration.new }
-  let(:klass)      { Blockbuster::ExtractionList }
-  let(:comparator) { Blockbuster::Comparator.new(configuration) }
-  let(:instance)   { klass.new(comparator, configuration) }
+  let(:klass)             { Blockbuster::ExtractionList }
+  let(:comparator)        { Blockbuster::Comparator.new(configuration) }
+  let(:instance)          { klass.new(comparator, configuration) }
 
   describe '#files' do
     it 'returns an array with the first element as a Blockbuster::Master' do
