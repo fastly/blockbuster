@@ -2,9 +2,6 @@ module Blockbuster
   # Manages cassette packaging and unpackaging
   class Manager
     include Blockbuster::OutputHelpers
-    extend Forwardable
-
-    # def_delegators :configuration, :cassette_directory, :master_tar_file, :local_mode, :test_directory, :silent, :wipe_cassette_dir
 
     def initialize(local_configuration = Blockbuster::Configuration.new)
       yield configuration if block_given?
