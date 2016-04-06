@@ -1,15 +1,15 @@
 require 'spec_helper'
 
 describe 'DeltaFeature' do
-  let(:base_dir)    { 'spec/integration_fixtures/' }
+  let(:base_dir)    { 'spec/integration_fixtures' }
   let(:unique_id)   { Digest::MD5.hexdigest(location) }
-  let(:unique_dir)  { "#{base_dir}#{unique_id}" }
+  let(:unique_dir)  { "#{base_dir}/#{unique_id}" }
   let(:config)      { Blockbuster::Configuration.new }
   let(:manager)     { Blockbuster::Manager.new(config) }
 
   before do
     FileUtils.mkdir_p(unique_dir)
-    FileUtils.copy("#{base_dir}vcr_cassettes.tar.gz", "#{unique_dir}/vcr_cassettes.tar.gz", preserve: true)
+    FileUtils.copy("#{base_dir}/vcr_cassettes.tar.gz", "#{unique_dir}/vcr_cassettes.tar.gz", preserve: true)
     config.test_directory = unique_dir
     config.silent = true
   end
@@ -77,16 +77,15 @@ describe 'DeltaFeature' do
   describe 'feature enabled' do
     before do
       config.enable_deltas = true
+      FileUtils.cp_r("#{base_dir}/deltas/", "#{unique_dir}")
     end
 
     it 'does not change master if no files have changed' do
       current_master_mtime = File.mtime(config.master_tar_file_path)
-
       manager.rent
       manager.drop_off
 
       new_master_mtime = File.mtime(config.master_tar_file_path)
-
       current_master_mtime.must_equal new_master_mtime
     end
 
@@ -128,9 +127,8 @@ describe 'DeltaFeature' do
       File.exist?(config.master_tar_file_path).must_equal true
     end
 
-    describe 'delta directory setup' do
-      it 'generates deltas directory if none exists' do
-      end
+    it 'untars deltas and does not change if nothing has happened' do
+
     end
 
     it 'initializes deltas' do

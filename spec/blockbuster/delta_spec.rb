@@ -21,7 +21,7 @@ describe Blockbuster::Delta do
       FileUtils.touch("#{dir}/#{current_time - 20}_b.tar.gz")
       FileUtils.touch("#{dir}/#{current_time - 10}_a.tar.gz")
 
-      klass.files(dir).must_equal ['c.tar.gz', 'b.tar.gz', 'a.tar.gz']
+      klass.files(dir).must_equal ["#{current_time - 30}_c.tar.gz", "#{current_time - 20}_b.tar.gz", "#{current_time - 10}_a.tar.gz"]
     end
   end
 
@@ -50,7 +50,18 @@ describe Blockbuster::Delta do
       deltas = klass.initialize_for_each(comparator, configuration)
       deltas.size.must_equal 1
       deltas[0].current?.must_equal true
-      deltas[0].file_path.must_equal "#{dir}/#{current_delta_name}"
+      deltas[0].file_path.must_equal "#{dir}/1_#{current_delta_name}"
+    end
+
+    it 'does not blow up when the delta name starts with digits and an underscore' do
+      FileUtils.rm Dir.glob("#{dir}/*.tar.gz")
+      configuration.stubs(:deltas_disabled?).returns(false)
+      configuration.current_delta_name = "123_testing.tar.gz"
+
+      deltas = klass.initialize_for_each(comparator, configuration)
+      deltas.size.must_equal 1
+      deltas[0].current?.must_equal true
+      deltas[0].file_path.must_equal "#{dir}/1_#{current_delta_name}"
     end
   end
 

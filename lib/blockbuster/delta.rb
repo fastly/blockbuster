@@ -11,11 +11,8 @@ module Blockbuster
       end
     end
 
-    # Dir.glob returns the full path for a file, dir/time_delta_name.tar.gz, so we strip out
-    # the directory path and then drop the first 11 characters (epoch time + _) to get the delta
-    # tar name. This will break in the 2200s because epoch will be 11 characters instead of 10.
     def self.files(directory)
-      Dir.glob("#{directory}/*.tar.gz").sort.map! { |file| File.basename(file)[11..-1] }
+      Dir.glob("#{directory}/*.tar.gz").sort.map! { |file| File.basename(file) }
     end
 
     def self.initialize_for_each(comparator, configuration)
@@ -25,7 +22,7 @@ module Blockbuster
 
       # If the current delta does not exist we want to add it.
       current_delta = configuration.current_delta_name
-      delta_files << current_delta unless delta_files.include?(current_delta)
+      delta_files << "1_#{current_delta}" unless delta_files.any?{ |file| file_name_without_timestamp(file) == current_delta }
 
       delta_files.map do |file|
         new(file, comparator, configuration)
@@ -39,6 +36,10 @@ module Blockbuster
       FileUtils.touch("#{directory}/.keep")
     end
 
+    def self.file_name_without_timestamp(file)
+      file.sub(/^\d+_/,'')
+    end
+
     attr_reader :current, :file_name, :configuration
 
     def initialize(file_name, comparator, configuration)
@@ -47,7 +48,7 @@ module Blockbuster
       @configuration = configuration
       @comparator = comparator
       @file_name  = file_name
-      @current    = true if @file_name == @configuration.current_delta_name
+      @current    = true if self.class.file_name_without_timestamp(@file_name) == @configuration.current_delta_name
     end
 
     def current
