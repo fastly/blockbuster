@@ -44,7 +44,6 @@ describe 'DeltaFeature' do
       manager.drop_off
       new_master_mtime = File.mtime(config.master_tar_file_path)
 
-
       current_master_mtime.wont_equal new_master_mtime
       manager.rent
       File.exist?("#{config.cassette_dir}/test_a.yml").must_equal false
@@ -58,14 +57,11 @@ describe 'DeltaFeature' do
       manager.drop_off
       new_master_mtime = File.mtime(config.master_tar_file_path)
 
-
       current_master_mtime.wont_equal new_master_mtime
       File.exist?("#{config.cassette_dir}/test_a.yml").must_equal true
     end
 
     it 'creates master if master does not exist' do
-      current_master_mtime = File.mtime(config.master_tar_file_path)
-
       manager.rent
       FileUtils.rm(config.master_tar_file_path)
       File.exist?(config.master_tar_file_path).must_equal false
@@ -73,7 +69,6 @@ describe 'DeltaFeature' do
       manager_2 = Blockbuster::Manager.new(config)
       manager_2.rent
       manager_2.drop_off
-
 
       File.exist?(config.master_tar_file_path).must_equal true
     end
@@ -83,7 +78,6 @@ describe 'DeltaFeature' do
     before do
       config.enable_deltas = true
     end
-
 
     it 'does not change master if no files have changed' do
       current_master_mtime = File.mtime(config.master_tar_file_path)
@@ -104,7 +98,6 @@ describe 'DeltaFeature' do
       manager.drop_off
       new_master_mtime = File.mtime(config.master_tar_file_path)
 
-
       current_master_mtime.must_equal new_master_mtime
       manager_2 = Blockbuster::Manager.new(config)
       manager_2.rent
@@ -119,14 +112,11 @@ describe 'DeltaFeature' do
       manager.drop_off
       new_master_mtime = File.mtime(config.master_tar_file_path)
 
-
       current_master_mtime.must_equal new_master_mtime
       File.exist?("#{config.cassette_dir}/test_a.yml").must_equal true
     end
 
     it 'creates master if master does not exist' do
-      current_master_mtime = File.mtime(config.master_tar_file_path)
-
       manager.rent
       FileUtils.rm(config.master_tar_file_path)
       File.exist?(config.master_tar_file_path).must_equal false
@@ -134,7 +124,6 @@ describe 'DeltaFeature' do
       manager_2 = Blockbuster::Manager.new(config)
       manager_2.rent
       manager_2.drop_off
-
 
       File.exist?(config.master_tar_file_path).must_equal true
     end
@@ -148,9 +137,6 @@ describe 'DeltaFeature' do
       Blockbuster::Delta.expects(:initialize_for_each).once.returns([])
       manager.rent
       manager.drop_off
-    end
-
-    describe 'no master exists' do
     end
 
     describe 'regenerating master' do

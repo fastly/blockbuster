@@ -7,8 +7,7 @@ module Blockbuster
         Zlib::GzipReader.wrap(file) do |gz|
           Gem::Package::TarReader.new(gz) do |tar|
             tar.each do |entry|
-              next unless entry.file?
-              untar_file(entry)
+              untar_file(entry) if entry.file?
             end
           end
         end
