@@ -70,6 +70,11 @@ describe Blockbuster::ExtractionList do
       end
 
       describe '#primary' do
+        before do
+          FileUtils.mkdir_p(configuration.test_directory)
+          FileUtils.touch(configuration.master_tar_file_path)
+        end
+
         it 'returns master if no master file exists' do
           File.stubs(:exist?).with(Blockbuster::Master.new(comparator, configuration).file_path).returns(false)
 
