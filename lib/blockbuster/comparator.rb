@@ -3,7 +3,7 @@ module Blockbuster
   class Comparator
     include Blockbuster::OutputHelpers
 
-    attr_reader :configuration
+    attr_reader :configuration, :hash
 
     def initialize(configuration)
       @configuration = configuration
