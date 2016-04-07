@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'yaml'
 
 describe 'DeltaFeature' do
   let(:base_dir)    { 'spec/integration_fixtures' }
@@ -107,7 +108,7 @@ describe 'DeltaFeature' do
       current_master_mtime = File.mtime(config.master_tar_file_path)
 
       manager.rent
-      File.truncate("#{config.cassette_dir}/test_a.yml", 0)
+      File.truncate("#{config.cassette_dir}/test_a.yml", 1)
       manager.drop_off
       new_master_mtime = File.mtime(config.master_tar_file_path)
 
@@ -162,7 +163,7 @@ describe 'DeltaFeature' do
       config.current_delta_name = 'delta_a.tar.gz'
 
       manager.rent
-      File.truncate("#{config.cassette_dir}/test_b.yml", 0)
+      File.truncate("#{config.cassette_dir}/test_b.yml", 1)
       manager.drop_off
 
       File.exist?("#{config.full_delta_directory}/1_#{config.current_delta_name}").must_equal false
@@ -189,11 +190,29 @@ describe 'DeltaFeature' do
 
       manager.rent
       FileUtils.rm("#{config.cassette_dir}/test_a.yml")
-      File.truncate("#{config.cassette_dir}/test_b.yml", 0)
+      File.truncate("#{config.cassette_dir}/test_b.yml", 1)
       manager.drop_off
 
       File.exist?("#{config.full_delta_directory}/1_#{config.current_delta_name}").must_equal false
       File.exist?("#{config.full_delta_directory}/#{curr_time.to_i}_#{config.current_delta_name}").must_equal true
+    end
+
+    it 'does not loose track of previously edited files' do
+      curr_time = Time.now
+      Time.stubs(:now).returns(curr_time)
+      config.current_delta_name = 'delta_a.tar.gz'
+
+      manager.rent
+      first_rent = YAML.load(File.open("#{config.cassette_dir}/test_a.yml"))
+      File.truncate("#{config.cassette_dir}/test_b.yml", 1)
+      manager.drop_off
+
+      FileUtils.rm_r("#{unique_dir}/cassettes")
+      manager_2 = Blockbuster::Manager.new(config)
+      manager_2.rent
+      second_rent = YAML.load(File.open("#{config.cassette_dir}/test_a.yml"))
+
+      first_rent.must_equal second_rent
     end
 
     it 'initializes deltas' do

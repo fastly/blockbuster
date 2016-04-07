@@ -3,7 +3,7 @@ module Blockbuster
   class Comparator
     include Blockbuster::OutputHelpers
 
-    attr_reader :configuration, :hash
+    attr_reader :configuration, :hash, :edited, :current_delta_files
 
     def initialize(configuration)
       @configuration = configuration
@@ -44,7 +44,7 @@ module Blockbuster
     end
 
     def edited?(file)
-      @edited.include?(file)
+      @edited.include?(file) || @current_delta_files.include?(file)
     end
 
     def store_current_delta_files
