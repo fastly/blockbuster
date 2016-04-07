@@ -277,7 +277,7 @@ describe 'DeltaFeature' do
         deltas = Dir.glob("#{config.full_delta_directory}/*")
         deltas.size.must_equal 1
         old_delta = deltas.first
-        old_delta.must_match(%r{^#{first_delta}$})
+        old_delta.must_match(/^#{first_delta}$/)
 
         # ok, and now we add a file, and get a new delta
         FileUtils.cp("#{base_dir}/cassettes/some_crazy_test.yml", config.cassette_dir)

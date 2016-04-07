@@ -55,7 +55,7 @@ module Blockbuster
 
     # compares the md5 sums of the files in the existing tarball
     # and the cassettes from the cassette directory.
-    def rewind?(files)
+    def rewind?(files) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength
       files.each do |file|
         next unless File.file?(file)
         key = configuration.key_from_path(file)
