@@ -7,7 +7,8 @@ module Blockbuster
 
     def initialize(configuration)
       @configuration = configuration
-      @hash = {}
+      @hash   = {}
+      @delete = {}
 
       @edited              = []
       @current_delta_files = []
@@ -31,7 +32,7 @@ module Blockbuster
 
     # returns true for any differences or changes in cassette files
     def compare(key, new_digest)
-      digest = @hash.delete(key)
+      digest = @hash[key]
 
       if digest.nil?
         silent_puts "New cassette: #{key}"
@@ -48,7 +49,7 @@ module Blockbuster
 
     def store_current_delta_files
       @hash.each do |k, v|
-        @current_delta_files << k if v['source'] == configuration.current_delta_name
+        @current_delta_files << k if v['source'].sub(/^\d+_/, '') == configuration.current_delta_name
       end
     end
 
@@ -61,7 +62,15 @@ module Blockbuster
         @edited << key if compare(key, configuration.file_digest(file))
       end
 
-      if present? && configuration.deltas_disabled?
+      base_files = files.map { |file| configuration.key_from_path(file) }
+      deleted =  @hash.keys - base_files
+
+      if !deleted.empty? && configuration.deltas_disabled?
+        silent_puts "Cassettes deleted: #{keys}"
+        return true
+      end
+
+      if configuration.deltas_enabled? && !(@current_delta_files & deleted).empty?
         silent_puts "Cassettes deleted: #{keys}"
         return true
       end

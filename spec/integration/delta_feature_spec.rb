@@ -182,6 +182,20 @@ describe 'DeltaFeature' do
       File.exist?("#{config.full_delta_directory}/#{curr_time.to_i}_#{config.current_delta_name}").must_equal false
     end
 
+    it 'does not blow up if edited files are deleted' do
+      curr_time = Time.now
+      Time.stubs(:now).returns(curr_time)
+      config.current_delta_name = 'delta_a.tar.gz'
+
+      manager.rent
+      FileUtils.rm("#{config.cassette_dir}/test_a.yml")
+      File.truncate("#{config.cassette_dir}/test_b.yml", 0)
+      manager.drop_off
+
+      File.exist?("#{config.full_delta_directory}/1_#{config.current_delta_name}").must_equal false
+      File.exist?("#{config.full_delta_directory}/#{curr_time.to_i}_#{config.current_delta_name}").must_equal true
+    end
+
     it 'initializes deltas' do
       Blockbuster::Delta.expects(:initialize_for_each).once.returns([])
       manager.rent
@@ -245,7 +259,7 @@ describe 'DeltaFeature' do
         deltas = Dir.glob("#{config.full_delta_directory}/*")
         deltas.size.must_equal 1
         old_delta = deltas.first
-        old_delta.must_match(/%r{^#{first_delta}$}/)
+        old_delta.must_match(%r{^#{first_delta}$})
 
         # ok, and now we add a file, and get a new delta
         FileUtils.cp("#{base_dir}/cassettes/some_crazy_test.yml", config.cassette_dir)
