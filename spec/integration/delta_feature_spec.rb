@@ -77,7 +77,7 @@ describe 'DeltaFeature' do
   describe 'feature enabled' do
     before do
       config.enable_deltas = true
-      FileUtils.cp_r("#{base_dir}/deltas/", "#{unique_dir}")
+      FileUtils.cp_r("#{base_dir}/deltas/", unique_dir)
     end
 
     it 'does not change master if no files have changed' do
@@ -128,7 +128,6 @@ describe 'DeltaFeature' do
     end
 
     it 'untars deltas and does not change if nothing has happened' do
-
     end
 
     it 'initializes deltas' do
