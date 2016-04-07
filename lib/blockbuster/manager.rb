@@ -3,6 +3,8 @@ module Blockbuster
   class Manager
     include Blockbuster::OutputHelpers
 
+    attr_reader :comparator
+
     def initialize(local_configuration = Blockbuster::Configuration.new)
       yield configuration if block_given?
 
