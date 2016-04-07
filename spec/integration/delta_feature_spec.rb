@@ -136,6 +136,87 @@ describe 'DeltaFeature' do
       manager.drop_off
     end
 
+    describe 'master -> delta 1 -> delta 2' do
+      before do
+        FileUtils.rm(config.master_tar_file_path)
+        FileUtils.rm_rf(config.full_delta_directory)
+        FileUtils.mkdir_p(config.cassette_dir)
+        FileUtils.cp("#{base_dir}/cassettes/match_requests_on.yml", config.cassette_dir)
+      end
+
+      it 'first creates master, then creates delta 1, then creates delta 2' do
+        # make sure we are starting from scratch
+        File.exist?(config.master_tar_file_path).must_equal false
+        Dir.exist?(config.full_delta_directory).must_equal false
+
+        # we expect master to record, and a delta directory will be created
+        manager_2 = Blockbuster::Manager.new(config)
+        manager_2.rent
+        manager_2.drop_off
+
+        File.exist?(config.master_tar_file_path).must_equal true
+        Dir.exist?(config.full_delta_directory).must_equal true
+        Dir.glob("#{config.full_delta_directory}/*").must_equal []
+
+        # let's verify our comparator extracts properly
+        manager_3 = Blockbuster::Manager.new(config)
+        manager_3.rent
+        manager_3.comparator.keys.size.must_equal 1
+        manager_3.comparator.hash['cassettes/match_requests_on.yml']['source'].must_equal config.master_tar_file
+        manager_3.drop_off
+        Dir.glob("#{config.full_delta_directory}/*").must_equal []
+
+        # now let's get a delta going
+        FileUtils.cp("#{base_dir}/cassettes/fake_example_response.yml", config.cassette_dir)
+
+        manager_4 = Blockbuster::Manager.new(config)
+        manager_4.rent
+        manager_4.drop_off
+        deltas = Dir.glob("#{config.full_delta_directory}/*")
+        deltas.size.must_equal 1
+        first_delta = deltas.first
+        first_delta.must_match(%r{^#{config.full_delta_directory}\/\d+_#{config.current_delta_name}$})
+
+        # and verify our comparator for proper extraction
+        manager_5 = Blockbuster::Manager.new(config)
+        manager_5.rent
+        manager_5.comparator.keys.size.must_equal 2
+        manager_5.comparator.hash['cassettes/match_requests_on.yml']['source'].must_equal config.master_tar_file
+        manager_5.comparator.hash['cassettes/fake_example_response.yml']['source'].must_equal File.basename(first_delta)
+        manager_5.drop_off
+
+        # let's change the current delta name and make sure we can run without losing our delta
+        config.current_delta_name = 'next_delta.tar.gz'
+        manager_6 = Blockbuster::Manager.new(config)
+        manager_6.rent
+        manager_6.drop_off
+        deltas = Dir.glob("#{config.full_delta_directory}/*")
+        deltas.size.must_equal 1
+        old_delta = deltas.first
+        old_delta.must_match(%r{^#{first_delta}$})
+
+        # ok, and now we add a file, and get a new delta
+        FileUtils.cp("#{base_dir}/cassettes/some_crazy_test.yml", config.cassette_dir)
+        manager_7 = Blockbuster::Manager.new(config)
+        manager_7.rent
+        manager_7.drop_off
+        deltas = Dir.glob("#{config.full_delta_directory}/*").sort
+        deltas.size.must_equal 2
+        deltas.first.must_equal first_delta
+        new_delta = deltas.last
+        new_delta.must_match(%r{^#{config.full_delta_directory}\/\d+_#{config.current_delta_name}$})
+
+        # and last verification that our comparator has proper extraction
+        manager_8 = Blockbuster::Manager.new(config)
+        manager_8.rent
+        manager_8.comparator.keys.size.must_equal 3
+        manager_8.comparator.hash['cassettes/match_requests_on.yml']['source'].must_equal config.master_tar_file
+        manager_8.comparator.hash['cassettes/fake_example_response.yml']['source'].must_equal File.basename(first_delta)
+        manager_8.comparator.hash['cassettes/some_crazy_test.yml']['source'].must_equal File.basename(new_delta)
+        manager_8.drop_off
+      end
+    end
+
     describe 'regenerating master' do
     end
   end
