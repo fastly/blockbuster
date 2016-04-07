@@ -22,7 +22,7 @@ module Blockbuster
 
       # If the current delta does not exist we want to add it.
       current_delta = configuration.current_delta_name
-      delta_files << "1_#{current_delta}" unless delta_files.any?{ |file| file_name_without_timestamp(file) == current_delta }
+      delta_files << "1_#{current_delta}" unless delta_files.any? { |file| file_name_without_timestamp(file) == current_delta }
 
       delta_files.map do |file|
         new(file, comparator, configuration)
@@ -37,7 +37,7 @@ module Blockbuster
     end
 
     def self.file_name_without_timestamp(file)
-      file.sub(/^\d+_/,'')
+      file.sub(/^\d+_/, '')
     end
 
     attr_reader :current, :file_name, :configuration

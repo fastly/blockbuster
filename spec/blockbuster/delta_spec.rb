@@ -56,7 +56,7 @@ describe Blockbuster::Delta do
     it 'does not blow up when the delta name starts with digits and an underscore' do
       FileUtils.rm Dir.glob("#{dir}/*.tar.gz")
       configuration.stubs(:deltas_disabled?).returns(false)
-      configuration.current_delta_name = "123_testing.tar.gz"
+      configuration.current_delta_name = '123_testing.tar.gz'
 
       deltas = klass.initialize_for_each(comparator, configuration)
       deltas.size.must_equal 1

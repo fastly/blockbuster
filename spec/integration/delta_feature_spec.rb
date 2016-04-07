@@ -127,7 +127,59 @@ describe 'DeltaFeature' do
       File.exist?(config.master_tar_file_path).must_equal true
     end
 
-    it 'untars deltas and does not change if nothing has happened' do
+    it 'untars deltas and does not create one if nothing has changed' do
+      curr_time = Time.now
+      Time.stubs(:now).returns(curr_time)
+      config.current_delta_name = 'delta_a.tar.gz'
+      current_delta_time = File.mtime("#{config.full_delta_directory}/1_#{config.current_delta_name}")
+
+      manager.rent
+      manager.drop_off
+
+      new_delta_time = File.mtime("#{config.full_delta_directory}/1_#{config.current_delta_name}")
+      current_delta_time.must_equal new_delta_time
+      File.exist?("#{config.full_delta_directory}/#{curr_time.to_i}_#{config.current_delta_name}").must_equal false
+    end
+
+    it 'untars deltas and does not create one in if a file from previous delta or master has been deleted' do
+      curr_time = Time.now
+      Time.stubs(:now).returns(curr_time)
+      config.current_delta_name = 'delta_a.tar.gz'
+      current_delta_time = File.mtime("#{config.full_delta_directory}/1_#{config.current_delta_name}")
+
+      manager.rent
+      FileUtils.rm("#{config.cassette_dir}/test_b.yml")
+      manager.drop_off
+
+      new_delta_time = File.mtime("#{config.full_delta_directory}/1_#{config.current_delta_name}")
+      current_delta_time.must_equal new_delta_time
+      File.exist?("#{config.full_delta_directory}/#{curr_time.to_i}_#{config.current_delta_name}").must_equal false
+    end
+
+    it 'untars deltas and recreates it if a file has been changed' do
+      curr_time = Time.now
+      Time.stubs(:now).returns(curr_time)
+      config.current_delta_name = 'delta_a.tar.gz'
+
+      manager.rent
+      File.truncate("#{config.cassette_dir}/test_b.yml", 0)
+      manager.drop_off
+
+      File.exist?("#{config.full_delta_directory}/1_#{config.current_delta_name}").must_equal false
+      File.exist?("#{config.full_delta_directory}/#{curr_time.to_i}_#{config.current_delta_name}").must_equal true
+    end
+
+    it 'deletes itself if has not changed any files' do
+      curr_time = Time.now
+      Time.stubs(:now).returns(curr_time)
+      config.current_delta_name = 'delta_a.tar.gz'
+
+      manager.rent
+      FileUtils.rm("#{config.cassette_dir}/test_a.yml")
+      manager.drop_off
+
+      File.exist?("#{config.full_delta_directory}/1_#{config.current_delta_name}").must_equal false
+      File.exist?("#{config.full_delta_directory}/#{curr_time.to_i}_#{config.current_delta_name}").must_equal false
     end
 
     it 'initializes deltas' do
@@ -193,7 +245,7 @@ describe 'DeltaFeature' do
         deltas = Dir.glob("#{config.full_delta_directory}/*")
         deltas.size.must_equal 1
         old_delta = deltas.first
-        old_delta.must_match(%r{^#{first_delta}$})
+        old_delta.must_match(/%r{^#{first_delta}$}/)
 
         # ok, and now we add a file, and get a new delta
         FileUtils.cp("#{base_dir}/cassettes/some_crazy_test.yml", config.cassette_dir)
