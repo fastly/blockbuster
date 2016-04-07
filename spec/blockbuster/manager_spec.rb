@@ -1,3 +1,5 @@
+require 'spec_helper'
+
 describe Blockbuster::Manager do
   let(:klass) { Blockbuster::Manager }
 
@@ -5,21 +7,11 @@ describe Blockbuster::Manager do
     let(:cass_dir)  { '/foo/bar' }
     let(:cass_file) { 'betamax.tar.gz' }
     let(:tst_dir)   { 'zspec' }
+    let(:configuration) { Blockbuster::Configuration.new }
 
-    it 'has default attributes' do
+    it 'has a default configuration' do
       manager = klass.new
-
-      manager.cassette_directory.must_equal Blockbuster.configuration.cassette_directory
-      manager.cassette_file.must_equal Blockbuster.configuration.cassette_file
-      manager.local_mode.must_equal false
-      manager.test_directory.must_equal Blockbuster.configuration.test_directory
-      manager.silent.must_equal false
-      manager.wipe_cassette_dir.must_equal Blockbuster.configuration.wipe_cassette_dir
-    end
-
-    it 'initializes with an empty comparison_hash' do
-      manager = klass.new
-      manager.comparison_hash.must_equal({})
+      manager.configuration.must_be_instance_of Blockbuster::Configuration
     end
   end
 
@@ -29,12 +21,11 @@ describe Blockbuster::Manager do
     let(:cassette_dir_path) { File.join(my_test_dir, 'cassettes') }
     let(:cassette_1)        { File.join(cassette_dir_path, 'match_requests_on.yml') }
     let(:cassette_2)        { File.join(cassette_dir_path, 'fake_example_response.yml') }
-    let(:manager)           { klass.new }
-
-    before do
-      Blockbuster.configure do |c|
+    let(:configuration)     { manager.configuration }
+    let(:manager) do
+      klass.new do |c|
         c.test_directory = my_test_dir
-        c.cassette_file = 'test_cassettes.tar.gz'
+        c.master_tar_file = 'test_cassettes.tar.gz'
         c.cassette_directory = cassette_dir
         c.silent = true
       end
@@ -54,16 +45,14 @@ describe Blockbuster::Manager do
         Dir.exist?(cassette_dir).must_equal false
       end
 
-      it 'returns false if the cassette file does not exists' do
-        Blockbuster.configuration.stub(:cassette_file, 'nosuchfile.tar.gz') do
-          manager = klass.new
+      it 'returns false if the master tar file does not exists' do
+        configuration.master_tar_file = 'nosuchfile.tar.gz'
 
-          manager.rent.must_equal false
-        end
+        manager.rent.must_equal false
       end
 
       it 'extracts cassette files' do
-        manager.cassette_file.must_equal 'test_cassettes.tar.gz'
+        configuration.master_tar_file.must_equal 'test_cassettes.tar.gz'
         manager.rent
 
         File.exist?(cassette_1).must_equal true
@@ -79,20 +68,20 @@ describe Blockbuster::Manager do
       it 'tracks a hash of each file for comparison upon teardown' do
         manager.rent
 
-        manager.comparison_hash.keys.must_include 'cassettes/match_requests_on.yml'
-        manager.comparison_hash.keys.must_include 'cassettes/fake_example_response.yml'
+        manager.instance_variable_get(:@comparator).keys.must_include 'cassettes/match_requests_on.yml'
+        manager.instance_variable_get(:@comparator).keys.must_include 'cassettes/fake_example_response.yml'
       end
 
       describe 'wipe_cassette_dir option' do
         before do
-          manager.cassette_file.must_equal 'test_cassettes.tar.gz'
+          manager.configuration.master_tar_file.must_equal 'test_cassettes.tar.gz'
           manager.rent
           FileUtils.touch(File.join(cassette_dir_path, 'fakefile'))
         end
 
         it 'wipes the existing cassette directory if wipe_cassette_dir is true' do
-          Blockbuster.configuration.stub(:wipe_cassette_dir, true) do
-            manager.wipe_cassette_dir.must_equal true
+          configuration.stub(:wipe_cassette_dir, true) do
+            manager.configuration.wipe_cassette_dir.must_equal true
 
             manager.rent
 
@@ -118,7 +107,7 @@ describe Blockbuster::Manager do
     end
 
     describe '.drop_off' do
-      let(:cass)      { manager.send(:cassette_file_path) }
+      let(:cass)      { manager.configuration.master_tar_file_path }
       let(:orig_cass) { "#{cass}.tmp" }
 
       before do
@@ -138,7 +127,7 @@ describe Blockbuster::Manager do
       end
 
       it 'creates a new cassette file if force is true' do
-        manager.stub(:silent, false) do
+        configuration.stub(:silent?, false) do
           proc { manager.drop_off(force: true) }.must_output(/Recreating cassette file/)
         end
 
@@ -149,7 +138,7 @@ describe Blockbuster::Manager do
         open(cassette_2, 'a') do |file|
           file << 'new recording'
         end
-        manager.stub(:silent, false) do
+        configuration.stub(:silent?, false) do
           proc { manager.drop_off(force: true) }.must_output(/Recreating cassette file/)
         end
 
@@ -164,37 +153,37 @@ describe Blockbuster::Manager do
       end
 
       it 'returns false if no files have changed' do
-        manager.rewind?.must_equal false
+        manager.instance_variable_get(:@comparator).rewind?(Dir.glob("#{cassette_dir_path}/**/*")).must_equal false
       end
 
       it 'returns true if a cassette file was changed' do
         open(cassette_2, 'a') do |file|
           file << 'new recording'
         end
-        manager.stub(:silent, false) do
-          proc { manager.rewind?.must_equal true }.must_output(/Cassette changed: /)
+        configuration.stub(:silent?, false) do
+          proc { manager.instance_variable_get(:@comparator).rewind?(Dir.glob("#{cassette_dir_path}/**/*")).must_equal true }.must_output(/Cassette changed: /)
         end
       end
 
-      it 'returns true if no comparison_hash was created' do
-        manager.comparison_hash = {}
-        manager.stub(:silent, false) do
-          proc { manager.rewind?.must_equal true }.must_output(/New cassette: /)
+      it 'returns true if no comparison was created' do
+        manager.instance_variable_set(:@comparator, Blockbuster::Comparator.new(configuration))
+        configuration.stub(:silent?, false) do
+          proc { manager.instance_variable_get(:@comparator).rewind?(Dir.glob("#{cassette_dir_path}/**/*")).must_equal true }.must_output(/New cassette: /)
         end
       end
 
       it 'returns false if a file was deleted from the cassettes directory' do
         FileUtils.rm(cassette_1)
-        manager.stub(:silent, false) do
-          proc { manager.rewind?.must_equal true }.must_output(/Cassettes deleted: /)
+        configuration.stub(:silent?, false) do
+          proc { manager.instance_variable_get(:@comparator).rewind?(Dir.glob("#{cassette_dir_path}/**/*")).must_equal true }.must_output(/Cassettes deleted: /)
         end
       end
 
       it 'returns false if a file was added to the cassettes directory' do
         new_cass = File.join(cassette_dir_path, 'new_cass.yml')
         FileUtils.touch(new_cass)
-        manager.stub(:silent, false) do
-          proc { manager.rewind?.must_equal true }.must_output(/New cassette: /)
+        configuration.stub(:silent?, false) do
+          proc { manager.instance_variable_get(:@comparator).rewind?(Dir.glob("#{cassette_dir_path}/**/*")).must_equal true }.must_output(/New cassette: /)
         end
       end
     end
