@@ -44,7 +44,7 @@ module Blockbuster
     end
 
     def edited?(file)
-      @edited.include?(file) || @current_delta_files.include?(file)
+      (@edited + @current_delta_files).include?(file)
     end
 
     def store_current_delta_files
@@ -71,6 +71,7 @@ module Blockbuster
       end
 
       if configuration.deltas_enabled? && !(@current_delta_files & deleted).empty?
+        @current_delta_files -= deleted
         silent_puts "Cassettes deleted: #{keys}"
         return true
       end

@@ -3,7 +3,6 @@ module Blockbuster
   module Packager
     def create_cassette_file
       FileUtils.rm(file_path) if File.exist?(file_path)
-      return if instance_of?(Blockbuster::Delta) && @comparator.edited.empty?
       File.open(target_path, 'wb') do |file|
         Zlib::GzipWriter.wrap(file) do |gz|
           Gem::Package::TarWriter.new(gz) do |tar|
