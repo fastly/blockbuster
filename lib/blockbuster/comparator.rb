@@ -71,7 +71,8 @@ module Blockbuster
       end
 
       if configuration.deltas_enabled? && !(@current_delta_files & deleted).empty?
-        @current_delta_files -= deleted
+        # For future use in deleting files from current delta
+        # @current_delta_files -= deleted
         silent_puts "Cassettes deleted: #{keys}"
         return true
       end
