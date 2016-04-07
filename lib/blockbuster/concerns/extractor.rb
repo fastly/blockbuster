@@ -18,7 +18,7 @@ module Blockbuster
       contents = entry.read
       @comparator.add(entry.full_name, configuration.tar_digest(contents), file_name)
 
-      save_to_disk(entry, contents) unless @local_mode
+      save_to_disk(entry, contents) unless configuration.local_mode
     end
 
     def save_to_disk(entry, contents)
