@@ -6,7 +6,7 @@ require 'blockbuster/configuration'
 require 'blockbuster/master'
 require 'blockbuster/delta'
 require 'blockbuster/concerns/output_helpers'
-require 'blockbuster/packager'
+require 'blockbuster/concerns/packager'
 
 require 'blockbuster/manager'
 require 'blockbuster/version'
