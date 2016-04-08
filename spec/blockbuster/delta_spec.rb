@@ -2,12 +2,13 @@ require 'spec_helper'
 
 describe Blockbuster::Delta do
   let(:configuration)      { Blockbuster::Configuration.new }
+  let(:comparator)         { Blockbuster::Comparator.new(configuration) }
   let(:klass)              { Blockbuster::Delta }
   let(:dir)                { configuration.full_delta_directory }
   let(:current_time)       { Time.now.to_i }
   let(:current_delta_name) { configuration.current_delta_name }
-  let(:instance)           { klass.new('some_file', configuration) }
-  let(:current_instance)   { klass.new(current_delta_name, configuration) }
+  let(:instance)           { klass.new('some_file', comparator, configuration) }
+  let(:current_instance)   { klass.new(current_delta_name, comparator, configuration) }
 
   before do
     configuration.enable_deltas = true
@@ -37,13 +38,13 @@ describe Blockbuster::Delta do
       klass.expects(:files).with(dir).returns([])
       configuration.expects(:deltas_disabled?).returns(false)
 
-      klass.initialize_for_each(configuration)
+      klass.initialize_for_each(comparator, configuration)
     end
 
     it 'returns an array of Delta objects' do
       configuration.stubs(:deltas_disabled?).returns(false)
 
-      response = klass.initialize_for_each(configuration)
+      response = klass.initialize_for_each(comparator, configuration)
       response.must_be_instance_of Array
       response[0].must_be_instance_of klass
     end
@@ -52,7 +53,7 @@ describe Blockbuster::Delta do
       FileUtils.rm Dir.glob("#{dir}/*.tar.gz")
       configuration.stubs(:deltas_disabled?).returns(false)
 
-      deltas = klass.initialize_for_each(configuration)
+      deltas = klass.initialize_for_each(comparator, configuration)
       deltas.size.must_equal 1
       deltas[0].current?.must_equal true
       deltas[0].file_path.must_equal "#{dir}/#{klass::INITIALIZING_NUMBER}_#{current_delta_name}"
@@ -63,7 +64,7 @@ describe Blockbuster::Delta do
       configuration.stubs(:deltas_disabled?).returns(false)
       configuration.current_delta_name = '123_testing.tar.gz'
 
-      deltas = klass.initialize_for_each(configuration)
+      deltas = klass.initialize_for_each(comparator, configuration)
       deltas.size.must_equal 1
       deltas[0].current?.must_equal true
       deltas[0].file_path.must_equal "#{dir}/#{klass::INITIALIZING_NUMBER}_#{current_delta_name}"
@@ -109,7 +110,7 @@ describe Blockbuster::Delta do
 
       it 'returns NotEnabledError' do
         e = assert_raises klass::NotEnabledError do
-          klass.new('some_file', configuration)
+          klass.new('some_file', comparator, configuration)
         end
 
         e.message.must_include 'Deltas are not enabled'
@@ -118,13 +119,13 @@ describe Blockbuster::Delta do
 
     describe 'deltas enabled' do
       it 'initializes with a configuration' do
-        delta = klass.new('some_file', configuration)
+        delta = klass.new('some_file', comparator, configuration)
 
         delta.configuration.must_equal configuration
       end
 
       it 'initializes with a file_name' do
-        delta = klass.new('some_file', configuration)
+        delta = klass.new('some_file', comparator, configuration)
 
         delta.file_name.must_equal 'some_file'
       end
@@ -133,21 +134,21 @@ describe Blockbuster::Delta do
         file_name = 'some_file'
         file_name.wont_equal current_delta_name
 
-        delta = klass.new(file_name, configuration)
+        delta = klass.new(file_name, comparator, configuration)
         delta.current.must_equal false
       end
 
       it 'initializes with current -> true if file_name == current_delta_name' do
-        delta = klass.new(current_delta_name, configuration)
+        delta = klass.new(current_delta_name, comparator, configuration)
         delta.current.must_equal true
       end
 
       it 'ignores timestamps when deciding on setting `current`' do
         file_name = "#{Time.now.to_i}_some_file"
-        delta = klass.new(file_name, configuration)
+        delta = klass.new(file_name, comparator, configuration)
         delta.current.must_equal false
 
-        delta = klass.new("#{Time.now.to_i}_#{current_delta_name}", configuration)
+        delta = klass.new("#{Time.now.to_i}_#{current_delta_name}", comparator, configuration)
         delta.current.must_equal true
       end
     end

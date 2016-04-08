@@ -14,7 +14,7 @@ module Blockbuster
       Dir.glob("#{directory}/*.tar.gz").sort.map { |file| File.basename(file) }
     end
 
-    def self.initialize_for_each(configuration)
+    def self.initialize_for_each(comparator, configuration)
       setup_directory(configuration.full_delta_directory)
 
       delta_files = files(configuration.full_delta_directory)
@@ -24,7 +24,7 @@ module Blockbuster
       delta_files << "#{INITIALIZING_NUMBER}_#{current_delta}" unless delta_files.any? { |file| file_name_without_timestamp(file) == current_delta }
 
       delta_files.map do |file|
-        new(file, configuration)
+        new(file, comparator, configuration)
       end
     end
 
@@ -41,10 +41,11 @@ module Blockbuster
 
     attr_reader :current, :file_name, :configuration
 
-    def initialize(file_name, configuration)
+    def initialize(file_name, comparator, configuration)
       raise NotEnabledError if configuration.deltas_disabled?
 
       @configuration = configuration
+      @comparator    = comparator
       @file_name     = file_name
       @current       = true if file_name_without_timestamp == configuration.current_delta_name
     end
