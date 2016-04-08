@@ -16,7 +16,10 @@ module Blockbuster
         :local_mode,
         :test_directory,
         :wipe_cassette_dir,
-        :silent
+        :silent,
+        :enable_deltas,
+        :delta_directory,
+        :current_delta_name
       ]
 
       attrs.each do |attr|
@@ -95,6 +98,66 @@ module Blockbuster
         configuration.local_mode = true
 
         configuration.local_mode.must_equal true
+      end
+    end
+
+    describe '#enable_deltas' do
+      it 'defaults to ENABLE_DELTAS' do
+        configuration.enable_deltas.must_equal klass::ENABLE_DELTAS
+      end
+
+      it 'returns assigned value' do
+        configuration.enable_deltas = true
+
+        configuration.enable_deltas.must_equal true
+      end
+    end
+
+    describe '#deltas_enabled?' do
+      it 'is an alias for `enable_deltas`' do
+        configuration.deltas_enabled?.must_equal configuration.enable_deltas
+
+        configuration.enable_deltas = true
+
+        configuration.deltas_enabled?.must_equal configuration.enable_deltas
+      end
+    end
+
+    describe '#deltas_disabled?' do
+      it 'is true when `deltas_enabled?` is false' do
+        configuration.deltas_enabled?.must_equal false
+        configuration.deltas_disabled?.must_equal true
+      end
+
+      it 'is false when `deltas_enabled?` is true' do
+        configuration.enable_deltas = true
+
+        configuration.deltas_enabled?.must_equal true
+        configuration.deltas_disabled?.must_equal false
+      end
+    end
+
+    describe '#delta_directory' do
+      it 'defaults to DELTA_DIRECTORY' do
+        configuration.delta_directory.must_equal klass::DELTA_DIRECTORY
+      end
+
+      it 'returns assigned value' do
+        configuration.delta_directory = 'somedir'
+
+        configuration.delta_directory.must_equal 'somedir'
+      end
+    end
+
+    describe '#current_delta_name' do
+      it 'defaults to CURRENT_DELTA_NAME' do
+        configuration.current_delta_name.must_equal klass::CURRENT_DELTA_NAME
+      end
+
+      it 'returns assigned value' do
+        configuration.current_delta_name = 'somefile'
+
+        configuration.current_delta_name.must_equal 'somefile'
       end
     end
   end
