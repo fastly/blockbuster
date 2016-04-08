@@ -1,6 +1,7 @@
 module Blockbuster
   # Manages cassette packaging and unpackaging
   class Manager
+    include Blockbuster::OutputHelpers
     include Blockbuster::Packager
 
     attr_accessor :comparison_hash
@@ -85,10 +86,6 @@ module Blockbuster
 
       silent_puts "Wiping cassettes directory: #{dir}"
       FileUtils.rm_r(dir) if Dir.exist?(dir)
-    end
-
-    def silent_puts(msg)
-      puts "[Blockbuster] #{msg}" unless configuration.silent?
     end
   end
 end
