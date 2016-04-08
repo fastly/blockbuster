@@ -14,6 +14,8 @@ module Blockbuster
       file_name.sub(/^\d+_/, '')
     end
 
+    attr_reader :current, :file_name, :configuration
+
     def initialize(file_name, configuration)
       raise NotEnabledError if configuration.deltas_disabled?
 
