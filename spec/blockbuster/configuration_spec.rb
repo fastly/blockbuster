@@ -158,6 +158,14 @@ describe Blockbuster::Configuration do
     end
   end
 
+  describe '#full_delta_directory' do
+    it 'returns a concatenation of test_directory and delta_directory' do
+      expected = "#{configuration.test_directory}/#{configuration.delta_directory}"
+
+      configuration.full_delta_directory.must_equal expected
+    end
+  end
+
   describe '#current_delta_name' do
     it 'defaults to CURRENT_DELTA_NAME' do
       configuration.current_delta_name.must_equal klass::CURRENT_DELTA_NAME

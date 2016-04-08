@@ -62,6 +62,10 @@ module Blockbuster
       @delta_directory ||= DELTA_DIRECTORY
     end
 
+    def full_delta_directory
+      File.join(test_directory, delta_directory)
+    end
+
     def current_delta_name
       @current_delta_name ||= CURRENT_DELTA_NAME
     end
