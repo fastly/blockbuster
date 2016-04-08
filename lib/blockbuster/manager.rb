@@ -2,27 +2,18 @@ module Blockbuster
   # Manages cassette packaging and unpackaging
   class Manager
     include Blockbuster::Packager
-    extend Forwardable
 
-    CASSETTE_FILE      = 'vcr_cassettes.tar.gz'.freeze
-    CASSETTE_DIRECTORY = 'cassettes'.freeze
-    TEST_DIRECTORY     = 'test'.freeze
-    WIPE_CASSETTE_DIR  = false
-
-    def_delegators :configuration, :cassette_directory, :cassette_file, :local_mode, :test_directory, :silent, :wipe_cassette_dir
     attr_accessor :comparison_hash
 
     def configuration
-      Blockbuster.configuration
+      @configuration ||= Blockbuster::Configuration.new
     end
 
-    # @param cassette_directory [String] Name of directory cassette files are stored.
-    #  Will be stored under the test directory. default: 'casssettes'
-    # @param cassette_file [String] name of gz cassettes file. default: 'vcr_cassettes.tar.gz'
-    # @param test_directory [String] path to test directory where cassete file and cassetes will be stored.
-    #  default: 'test'
-    # @param silent [Boolean] Silence all output. default: false
-    def initialize
+    def initialize(instance_configuration = Blockbuster::Configuration.new)
+      yield configuration if block_given?
+
+      @configuration ||= instance_configuration
+
       @comparison_hash = {}
     end
 
@@ -35,7 +26,7 @@ module Blockbuster
         return false
       end
 
-      remove_existing_cassette_directory if wipe_cassette_dir
+      remove_existing_cassette_directory if configuration.wipe_cassette_dir
 
       silent_puts "Extracting VCR cassettes to #{cassette_dir}"
 
@@ -45,7 +36,7 @@ module Blockbuster
     # repackages cassettes into a compressed tarball
     def drop_off(force: false)
       if rewind? || force
-        silent_puts "Recreating cassette file #{CASSETTE_FILE}"
+        silent_puts "Recreating cassette file #{configuration.cassette_file}"
         create_cassette_file
       end
     end
@@ -89,27 +80,27 @@ module Blockbuster
 
     def key_from_path(file)
       path_array = File.dirname(file).split('/')
-      idx = path_array.index(cassette_directory)
+      idx = path_array.index(configuration.cassette_directory)
       path_array[idx..-1].push(File.basename(file)).join('/')
     end
 
     def cassette_dir
-      File.join(test_directory, cassette_directory)
+      File.join(configuration.test_directory, configuration.cassette_directory)
     end
 
     def cassette_file_path
-      File.join(test_directory, cassette_file)
+      File.join(configuration.test_directory, configuration.cassette_file)
     end
 
     def remove_existing_cassette_directory
-      return if @local_mode
+      return if configuration.local_mode
 
       silent_puts "Wiping cassettes directory: #{cassette_dir}"
       FileUtils.rm_r(cassette_dir) if Dir.exist?(cassette_dir)
     end
 
     def silent?
-      silent
+      configuration.silent
     end
 
     def silent_puts(msg)

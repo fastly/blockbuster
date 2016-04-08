@@ -54,11 +54,11 @@ module Blockbuster
     end
 
     def untar_file(entry)
-      destination = File.join test_directory, entry.full_name
+      destination = File.join configuration.test_directory, entry.full_name
 
       contents = read_entry_and_hash(entry)
 
-      return if @local_mode
+      return if configuration.local_mode
 
       FileUtils.mkdir_p(File.dirname(destination))
       File.open(destination, 'wb') do |cass|
