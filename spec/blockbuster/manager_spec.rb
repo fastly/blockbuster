@@ -43,7 +43,7 @@ describe Blockbuster::Manager do
     let(:manager) do
       klass.new do |c|
         c.test_directory = my_test_dir
-        c.cassette_file = 'test_cassettes.tar.gz'
+        c.master_tar_file = 'test_cassettes.tar.gz'
         c.cassette_directory = cassette_dir
         c.silent = true
       end
@@ -64,13 +64,13 @@ describe Blockbuster::Manager do
       end
 
       it 'returns false if the cassette file does not exists' do
-        configuration.cassette_file = 'nosuchfile.tar.gz'
+        configuration.master_tar_file = 'nosuchfile.tar.gz'
 
         manager.rent.must_equal false
       end
 
       it 'extracts cassette files' do
-        configuration.cassette_file.must_equal 'test_cassettes.tar.gz'
+        configuration.master_tar_file.must_equal 'test_cassettes.tar.gz'
         manager.rent
 
         File.exist?(cassette_1).must_equal true
@@ -92,7 +92,7 @@ describe Blockbuster::Manager do
 
       describe 'wipe_cassette_dir option' do
         before do
-          configuration.cassette_file.must_equal 'test_cassettes.tar.gz'
+          configuration.master_tar_file.must_equal 'test_cassettes.tar.gz'
           manager.rent
           FileUtils.touch(File.join(cassette_dir_path, 'fakefile'))
         end

@@ -36,7 +36,7 @@ module Blockbuster
     # repackages cassettes into a compressed tarball
     def drop_off(force: false)
       if rewind? || force
-        silent_puts "Recreating cassette file #{configuration.cassette_file}"
+        silent_puts "Recreating cassette file #{configuration.master_tar_file}"
         create_cassette_file
       end
     end
@@ -89,7 +89,7 @@ module Blockbuster
     end
 
     def cassette_file_path
-      File.join(configuration.test_directory, configuration.cassette_file)
+      File.join(configuration.test_directory, configuration.master_tar_file)
     end
 
     def remove_existing_cassette_directory
