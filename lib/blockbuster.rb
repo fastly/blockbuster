@@ -5,6 +5,7 @@ require 'zlib'
 require 'blockbuster/configuration'
 require 'blockbuster/master'
 require 'blockbuster/delta'
+require 'blockbuster/concerns/file_helpers'
 require 'blockbuster/concerns/output_helpers'
 require 'blockbuster/concerns/packager'
 
