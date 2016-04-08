@@ -8,7 +8,32 @@ module Blockbuster
       end
     end
 
-    attr_reader :current, :file_name, :configuration
+    INITIALIZING_NUMBER = 101_010_101
+
+    def self.files(directory)
+      Dir.glob("#{directory}/*.tar.gz").sort.map { |file| File.basename(file) }
+    end
+
+    def self.initialize_for_each(configuration)
+      setup_directory(configuration.full_delta_directory)
+
+      delta_files = files(configuration.full_delta_directory)
+
+      # If the current delta doesn't exist we want to add it
+      current_delta = configuration.current_delta_name
+      delta_files << "#{INITIALIZING_NUMBER}_#{current_delta}" unless delta_files.any? { |file| file_name_without_timestamp(file) == current_delta }
+
+      delta_files.map do |file|
+        new(file, configuration)
+      end
+    end
+
+    def self.setup_directory(directory)
+      return if Dir.exist?(directory)
+
+      FileUtils.mkdir_p(directory)
+      FileUtils.touch("#{directory}/.keep")
+    end
 
     def self.file_name_without_timestamp(file_name)
       file_name.sub(/^\d+_/, '')

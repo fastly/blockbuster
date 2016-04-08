@@ -1,13 +1,90 @@
 require 'spec_helper'
 
 describe Blockbuster::Delta do
-  let(:configuration)    { Blockbuster::Configuration.new }
-  let(:klass)            { Blockbuster::Delta }
-  let(:instance)         { klass.new('some_file', configuration) }
-  let(:current_instance) { klass.new(configuration.current_delta_name, configuration) }
+  let(:configuration)      { Blockbuster::Configuration.new }
+  let(:klass)              { Blockbuster::Delta }
+  let(:dir)                { configuration.full_delta_directory }
+  let(:current_time)       { Time.now.to_i }
+  let(:current_delta_name) { configuration.current_delta_name }
+  let(:instance)           { klass.new('some_file', configuration) }
+  let(:current_instance)   { klass.new(current_delta_name, configuration) }
 
   before do
     configuration.enable_deltas = true
+  end
+
+  describe '.files' do
+    it 'returns an empty array when there are no tests' do
+      FileUtils.rm Dir.glob("#{dir}/*.tar.gz")
+      klass.files(dir).must_equal []
+    end
+
+    it 'returns an list of files ordered by time' do
+      FileUtils.rm Dir.glob("#{dir}/*.tar.gz")
+
+      FileUtils.touch("#{dir}/#{current_time - 30}_c.tar.gz")
+      FileUtils.touch("#{dir}/#{current_time - 20}_b.tar.gz")
+      FileUtils.touch("#{dir}/#{current_time - 10}_a.tar.gz")
+
+      klass.files(dir).must_equal ["#{current_time - 30}_c.tar.gz", "#{current_time - 20}_b.tar.gz", "#{current_time - 10}_a.tar.gz"]
+    end
+  end
+
+  describe '.initialize_for_each' do
+    it 'calls .setup_directory and .files once' do
+      FileUtils.rm Dir.glob("#{dir}/*.tar.gz")
+      klass.expects(:setup_directory).with(dir)
+      klass.expects(:files).with(dir).returns([])
+      configuration.expects(:deltas_disabled?).returns(false)
+
+      klass.initialize_for_each(configuration)
+    end
+
+    it 'returns an array of Delta objects' do
+      configuration.stubs(:deltas_disabled?).returns(false)
+
+      response = klass.initialize_for_each(configuration)
+      response.must_be_instance_of Array
+      response[0].must_be_instance_of klass
+    end
+
+    it 'if there are no deltas the array includes the current delta' do
+      FileUtils.rm Dir.glob("#{dir}/*.tar.gz")
+      configuration.stubs(:deltas_disabled?).returns(false)
+
+      deltas = klass.initialize_for_each(configuration)
+      deltas.size.must_equal 1
+      deltas[0].current?.must_equal true
+      deltas[0].file_path.must_equal "#{dir}/#{klass::INITIALIZING_NUMBER}_#{current_delta_name}"
+    end
+
+    it 'does not blow up when the delta name starts with digits and an underscore' do
+      FileUtils.rm Dir.glob("#{dir}/*.tar.gz")
+      configuration.stubs(:deltas_disabled?).returns(false)
+      configuration.current_delta_name = '123_testing.tar.gz'
+
+      deltas = klass.initialize_for_each(configuration)
+      deltas.size.must_equal 1
+      deltas[0].current?.must_equal true
+      deltas[0].file_path.must_equal "#{dir}/#{klass::INITIALIZING_NUMBER}_#{current_delta_name}"
+    end
+  end
+
+  describe '.setup_directory' do
+    it 'returns early if the directory exists' do
+      klass.setup_directory(dir)
+      FileUtils.expects(:mkdir_p).never
+
+      klass.setup_directory(dir)
+    end
+
+    it 'creates the directory and adds a .keep file if it does not exist' do
+      FileUtils.rm_r dir
+
+      klass.setup_directory(dir)
+      File.directory?(dir).must_equal true
+      File.exist?("#{dir}/.keep").must_equal true
+    end
   end
 
   describe '.file_name_without_timestamp' do
@@ -54,14 +131,14 @@ describe Blockbuster::Delta do
 
       it 'initializes with current -> false if file_name != current_delta_name' do
         file_name = 'some_file'
-        file_name.wont_equal configuration.current_delta_name
+        file_name.wont_equal current_delta_name
 
         delta = klass.new(file_name, configuration)
         delta.current.must_equal false
       end
 
       it 'initializes with current -> true if file_name == current_delta_name' do
-        delta = klass.new(configuration.current_delta_name, configuration)
+        delta = klass.new(current_delta_name, configuration)
         delta.current.must_equal true
       end
 
@@ -70,7 +147,7 @@ describe Blockbuster::Delta do
         delta = klass.new(file_name, configuration)
         delta.current.must_equal false
 
-        delta = klass.new("#{Time.now.to_i}_#{configuration.current_delta_name}", configuration)
+        delta = klass.new("#{Time.now.to_i}_#{current_delta_name}", configuration)
         delta.current.must_equal true
       end
     end
@@ -103,7 +180,7 @@ describe Blockbuster::Delta do
 
   describe '#file_path' do
     it 'returns a concatenation of full_delta_directory and file_name' do
-      expected = "#{configuration.full_delta_directory}/#{instance.file_name}"
+      expected = "#{dir}/#{instance.file_name}"
 
       instance.file_path.must_equal expected
     end
@@ -114,7 +191,7 @@ describe Blockbuster::Delta do
       current_time = Time.now
       Time.stubs(:now).returns(current_time)
 
-      expected = "#{configuration.full_delta_directory}/#{current_time.to_i}_#{configuration.current_delta_name}"
+      expected = "#{dir}/#{current_time.to_i}_#{current_delta_name}"
 
       instance.target_path.must_equal expected
     end
