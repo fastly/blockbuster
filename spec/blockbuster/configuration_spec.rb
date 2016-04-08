@@ -74,6 +74,16 @@ describe Blockbuster::Configuration do
     end
   end
 
+  describe '#silent?' do
+    it 'is an alias for `silent`' do
+      configuration.silent?.must_equal configuration.silent
+
+      configuration.silent = true
+
+      configuration.silent?.must_equal configuration.silent
+    end
+  end
+
   describe '#wipe_cassette_dir' do
     it 'defaults to WIPE_CASSETTE_DIR' do
       configuration.wipe_cassette_dir.must_equal klass::WIPE_CASSETTE_DIR

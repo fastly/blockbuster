@@ -99,12 +99,8 @@ module Blockbuster
       FileUtils.rm_r(cassette_dir) if Dir.exist?(cassette_dir)
     end
 
-    def silent?
-      configuration.silent
-    end
-
     def silent_puts(msg)
-      puts "[Blockbuster] #{msg}" unless silent?
+      puts "[Blockbuster] #{msg}" unless configuration.silent?
     end
   end
 end

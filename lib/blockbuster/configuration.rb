@@ -38,6 +38,8 @@ module Blockbuster
       @silent ||= SILENT
     end
 
+    alias silent? silent
+
     def wipe_cassette_dir
       @wipe_cassette_dir ||= WIPE_CASSETTE_DIR
     end
