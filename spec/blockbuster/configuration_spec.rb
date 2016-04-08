@@ -169,4 +169,29 @@ describe Blockbuster::Configuration do
       configuration.current_delta_name.must_equal 'somefile'
     end
   end
+
+  describe '#key_from_path' do
+    it 'returns the cassette_dir/file given a full path to a file' do
+      expected = "#{configuration.cassette_directory}/some_file.txt"
+      file = "/Path/to/#{expected}"
+
+      configuration.key_from_path(file).must_equal expected
+    end
+  end
+
+  describe '#cassette_dir' do
+    it 'returns a concatenation of test_directory and cassette_directory' do
+      expected = "#{configuration.test_directory}/#{configuration.cassette_directory}"
+
+      configuration.cassette_dir.must_equal expected
+    end
+  end
+
+  describe '#cassette_file_path' do
+    it 'returns a concatenation of test_directory and the master_tar_file' do
+      expected = "#{configuration.test_directory}/#{configuration.master_tar_file}"
+
+      configuration.cassette_file_path.must_equal expected
+    end
+  end
 end

@@ -65,5 +65,19 @@ module Blockbuster
     def current_delta_name
       @current_delta_name ||= CURRENT_DELTA_NAME
     end
+
+    def key_from_path(file)
+      path_array = File.dirname(file).split('/')
+      idx = path_array.index(cassette_directory)
+      path_array[idx..-1].push(File.basename(file)).join('/')
+    end
+
+    def cassette_dir
+      File.join(test_directory, cassette_directory)
+    end
+
+    def cassette_file_path
+      File.join(test_directory, master_tar_file)
+    end
   end
 end

@@ -21,14 +21,14 @@ module Blockbuster
     #
     # tracks a md5 hash of each file in the tarball
     def rent
-      unless File.exist?(cassette_file_path)
-        silent_puts "File does not exist: #{cassette_file_path}."
+      unless File.exist?(configuration.cassette_file_path)
+        silent_puts "File does not exist: #{configuration.cassette_file_path}."
         return false
       end
 
       remove_existing_cassette_directory if configuration.wipe_cassette_dir
 
-      silent_puts "Extracting VCR cassettes to #{cassette_dir}"
+      silent_puts "Extracting VCR cassettes to #{configuration.cassette_dir}"
 
       extract_cassettes
     end
@@ -46,9 +46,9 @@ module Blockbuster
     # compares the md5 sums of the files in the existing tarball
     # and the cassettes from the cassette directory.
     def rewind?(retval = nil)
-      Dir.glob("#{cassette_dir}/**/*").each do |file|
+      Dir.glob("#{configuration.cassette_dir}/**/*").each do |file|
         next unless File.file?(file)
-        comp = compare_cassettes(key_from_path(file), file)
+        comp = compare_cassettes(configuration.key_from_path(file), file)
         retval ||= comp
       end
 
@@ -78,25 +78,13 @@ module Blockbuster
       end
     end
 
-    def key_from_path(file)
-      path_array = File.dirname(file).split('/')
-      idx = path_array.index(configuration.cassette_directory)
-      path_array[idx..-1].push(File.basename(file)).join('/')
-    end
-
-    def cassette_dir
-      File.join(configuration.test_directory, configuration.cassette_directory)
-    end
-
-    def cassette_file_path
-      File.join(configuration.test_directory, configuration.master_tar_file)
-    end
-
     def remove_existing_cassette_directory
       return if configuration.local_mode
 
-      silent_puts "Wiping cassettes directory: #{cassette_dir}"
-      FileUtils.rm_r(cassette_dir) if Dir.exist?(cassette_dir)
+      dir = configuration.cassette_dir
+
+      silent_puts "Wiping cassettes directory: #{dir}"
+      FileUtils.rm_r(dir) if Dir.exist?(dir)
     end
 
     def silent_puts(msg)
