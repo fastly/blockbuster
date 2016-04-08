@@ -4,6 +4,7 @@ require 'zlib'
 
 require 'blockbuster/configuration'
 require 'blockbuster/master'
+require 'blockbuster/delta'
 require 'blockbuster/concerns/output_helpers'
 require 'blockbuster/packager'
 
