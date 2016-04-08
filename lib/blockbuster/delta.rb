@@ -1,6 +1,8 @@
 module Blockbuster
   # Delta file objects
   class Delta
+    include Blockbuster::Packager
+
     # nodoc
     class NotEnabledError < StandardError
       def message

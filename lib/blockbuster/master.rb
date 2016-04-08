@@ -1,6 +1,8 @@
 module Blockbuster
   # Master file object
   class Master
+    include Blockbuster::Packager
+
     attr_reader :file_name, :configuration
 
     def initialize(comparator, configuration)
