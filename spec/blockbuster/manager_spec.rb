@@ -26,11 +26,6 @@ describe Blockbuster::Manager do
       manager.configuration.test_directory.must_equal tst_dir
       manager.configuration.silent.must_equal true
     end
-
-    it 'initializes with an empty comparison_hash' do
-      manager = klass.new
-      manager.comparison_hash.must_equal({})
-    end
   end
 
   describe 'instance methods' do
@@ -86,8 +81,8 @@ describe Blockbuster::Manager do
       it 'tracks a hash of each file for comparison upon teardown' do
         manager.rent
 
-        manager.comparison_hash.keys.must_include 'cassettes/match_requests_on.yml'
-        manager.comparison_hash.keys.must_include 'cassettes/fake_example_response.yml'
+        manager.comparator.keys.must_include 'cassettes/match_requests_on.yml'
+        manager.comparator.keys.must_include 'cassettes/fake_example_response.yml'
       end
 
       describe 'wipe_cassette_dir option' do
@@ -170,7 +165,7 @@ describe Blockbuster::Manager do
       end
 
       it 'returns false if no files have changed' do
-        manager.rewind?.must_equal false
+        manager.instance_variable_get(:@comparator).rewind?(Dir.glob("#{cassette_dir_path}/**/*")).must_equal false
       end
 
       it 'returns true if a cassette file was changed' do
@@ -180,23 +175,22 @@ describe Blockbuster::Manager do
 
         configuration.silent = false
 
-        proc { manager.rewind?.must_equal true }.must_output(/Cassette changed: /)
+        proc { manager.instance_variable_get(:@comparator).rewind?(Dir.glob("#{cassette_dir_path}/**/*")).must_equal true }.must_output(/Cassette changed: /)
       end
 
-      it 'returns true if no comparison_hash was created' do
-        manager.comparison_hash = {}
+      it 'returns true if no comparison was created' do
+        manager.instance_variable_set(:@comparator, Blockbuster::Comparator.new(configuration))
 
         configuration.silent = false
 
-        proc { manager.rewind?.must_equal true }.must_output(/New cassette: /)
+        proc { manager.instance_variable_get(:@comparator).rewind?(Dir.glob("#{cassette_dir_path}/**/*")).must_equal true }.must_output(/New cassette: /)
       end
 
       it 'returns false if a file was deleted from the cassettes directory' do
         FileUtils.rm(cassette_1)
-
         configuration.silent = false
 
-        proc { manager.rewind?.must_equal true }.must_output(/Cassettes deleted: /)
+        proc { manager.instance_variable_get(:@comparator).rewind?(Dir.glob("#{cassette_dir_path}/**/*")).must_equal true }.must_output(/Cassettes deleted: /)
       end
 
       it 'returns false if a file was added to the cassettes directory' do
@@ -205,7 +199,7 @@ describe Blockbuster::Manager do
 
         configuration.silent = false
 
-        proc { manager.rewind?.must_equal true }.must_output(/New cassette: /)
+        proc { manager.instance_variable_get(:@comparator).rewind?(Dir.glob("#{cassette_dir_path}/**/*")).must_equal true }.must_output(/New cassette: /)
       end
     end
   end

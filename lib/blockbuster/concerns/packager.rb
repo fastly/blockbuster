@@ -1,14 +1,12 @@
 module Blockbuster
   # pure ruby implmentation of tar gzip and diff
   module Packager
-    private
-
     def create_cassette_file
-      FileUtils.rm(configuration.master_tar_file_path) if File.exist?(configuration.master_tar_file_path)
-      File.open(configuration.master_tar_file_path, 'wb') do |file|
+      FileUtils.rm(file_path) if File.exist?(file_path)
+      File.open(target_path, 'wb') do |file|
         Zlib::GzipWriter.wrap(file) do |gz|
           Gem::Package::TarWriter.new(gz) do |tar|
-            Dir.glob(File.join(configuration.cassette_dir, '**/*')).each do |cass|
+            configuration.cassette_files.each do |cass|
               tar_file(tar, cass)
             end
           end
@@ -17,12 +15,11 @@ module Blockbuster
     end
 
     def extract_cassettes
-      File.open(configuration.master_tar_file_path, 'rb') do |file|
+      File.open(file_path, 'rb') do |file|
         Zlib::GzipReader.wrap(file) do |gz|
           Gem::Package::TarReader.new(gz) do |tar|
             tar.each do |entry|
-              next unless entry.file?
-              untar_file(entry)
+              untar_file(entry) if entry.file?
             end
           end
         end
@@ -36,7 +33,7 @@ module Blockbuster
     def read_entry_and_hash(entry)
       contents = entry.read
 
-      comparison_hash[entry.full_name] = Digest::MD5.hexdigest(contents)
+      @comparator.add(entry.full_name, Digest::MD5.hexdigest(contents), file_name)
       contents
     end
 
