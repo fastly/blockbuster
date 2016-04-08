@@ -80,6 +80,10 @@ module Blockbuster
       File.join(test_directory, cassette_directory)
     end
 
+    def cassette_files
+      Dir.glob("#{cassette_dir}/**/*")
+    end
+
     def master_tar_file_path
       File.join(test_directory, master_tar_file)
     end

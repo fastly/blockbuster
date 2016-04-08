@@ -195,6 +195,23 @@ describe Blockbuster::Configuration do
     end
   end
 
+  describe '#cassette_files' do
+    it 'returns an empty array when no files are found' do
+      configuration.cassette_files.must_equal []
+    end
+
+    it 'returns an array of files' do
+      expected = "#{configuration.cassette_dir}/somefile.txt"
+
+      FileUtils.mkdir_p(configuration.cassette_dir)
+      FileUtils.touch(expected)
+
+      configuration.cassette_files.must_equal [expected]
+
+      FileUtils.rm_r(expected)
+    end
+  end
+
   describe '#master_tar_file_path' do
     it 'returns a concatenation of test_directory and the master_tar_file' do
       expected = "#{configuration.test_directory}/#{configuration.master_tar_file}"
