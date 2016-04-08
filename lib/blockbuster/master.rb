@@ -3,8 +3,9 @@ module Blockbuster
   class Master
     attr_reader :file_name, :configuration
 
-    def initialize(configuration)
+    def initialize(comparator, configuration)
       @configuration = configuration
+      @comparator    = comparator
       @file_name     = configuration.master_tar_file
     end
 

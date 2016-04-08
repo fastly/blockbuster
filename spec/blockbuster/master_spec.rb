@@ -2,8 +2,9 @@ require 'spec_helper'
 
 describe Blockbuster::Master do
   let(:configuration) { Blockbuster::Configuration.new }
+  let(:comparator)    { Blockbuster::Comparator.new(configuration) }
   let(:klass)         { Blockbuster::Master }
-  let(:instance)      { klass.new(configuration) }
+  let(:instance)      { klass.new(comparator, configuration) }
 
   describe '#initialize' do
     it 'initializes with a configuration object' do
