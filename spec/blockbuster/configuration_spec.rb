@@ -187,11 +187,11 @@ describe Blockbuster::Configuration do
     end
   end
 
-  describe '#cassette_file_path' do
+  describe '#master_tar_file_path' do
     it 'returns a concatenation of test_directory and the master_tar_file' do
       expected = "#{configuration.test_directory}/#{configuration.master_tar_file}"
 
-      configuration.cassette_file_path.must_equal expected
+      configuration.master_tar_file_path.must_equal expected
     end
   end
 end

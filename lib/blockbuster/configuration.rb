@@ -76,7 +76,7 @@ module Blockbuster
       File.join(test_directory, cassette_directory)
     end
 
-    def cassette_file_path
+    def master_tar_file_path
       File.join(test_directory, master_tar_file)
     end
   end

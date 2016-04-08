@@ -123,7 +123,7 @@ describe Blockbuster::Manager do
     end
 
     describe '.drop_off' do
-      let(:cass)      { configuration.cassette_file_path }
+      let(:cass)      { configuration.master_tar_file_path }
       let(:orig_cass) { "#{cass}.tmp" }
 
       before do

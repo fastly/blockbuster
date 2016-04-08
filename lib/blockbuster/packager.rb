@@ -4,8 +4,8 @@ module Blockbuster
     private
 
     def create_cassette_file
-      FileUtils.rm(configuration.cassette_file_path) if File.exist?(configuration.cassette_file_path)
-      File.open(configuration.cassette_file_path, 'wb') do |file|
+      FileUtils.rm(configuration.master_tar_file_path) if File.exist?(configuration.master_tar_file_path)
+      File.open(configuration.master_tar_file_path, 'wb') do |file|
         Zlib::GzipWriter.wrap(file) do |gz|
           Gem::Package::TarWriter.new(gz) do |tar|
             Dir.glob(File.join(configuration.cassette_dir, '**/*')).each do |cass|
@@ -17,7 +17,7 @@ module Blockbuster
     end
 
     def extract_cassettes
-      File.open(configuration.cassette_file_path, 'rb') do |file|
+      File.open(configuration.master_tar_file_path, 'rb') do |file|
         Zlib::GzipReader.wrap(file) do |gz|
           Gem::Package::TarReader.new(gz) do |tar|
             tar.each do |entry|
