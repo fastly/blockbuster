@@ -1,6 +1,7 @@
 module Blockbuster
   # Delta file objects
   class Delta
+    include Blockbuster::Extractor
     include Blockbuster::Packager
 
     # nodoc

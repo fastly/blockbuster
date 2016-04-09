@@ -1,6 +1,7 @@
 module Blockbuster
   # Master file object
   class Master
+    include Blockbuster::Extractor
     include Blockbuster::Packager
 
     attr_reader :file_name, :configuration
