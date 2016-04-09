@@ -22,8 +22,10 @@ module Blockbuster
     #
     # tracks a md5 hash of each file in the tarball
     def rent
-      unless File.exist?(@extraction_list.master.file_path)
-        silent_puts "File does not exist: #{@extraction_list.master.file_path}."
+      master_file_path = @extraction_list.master.file_path
+
+      unless File.exist?(master_file_path)
+        silent_puts "File does not exist: #{master_file_path}."
         return false
       end
 
