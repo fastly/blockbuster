@@ -5,10 +5,6 @@ module Blockbuster
 
     attr_accessor :comparator
 
-    def configuration
-      @configuration ||= Blockbuster::Configuration.new
-    end
-
     def initialize(instance_configuration = Blockbuster::Configuration.new)
       yield configuration if block_given?
 
@@ -16,6 +12,10 @@ module Blockbuster
 
       @comparator      = Comparator.new(@configuration)
       @extraction_list = ExtractionList.new(@comparator, @configuration)
+    end
+
+    def configuration
+      @configuration ||= Blockbuster::Configuration.new
     end
 
     # extracts cassettes from a tar.gz file
