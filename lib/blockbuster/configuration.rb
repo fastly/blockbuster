@@ -9,7 +9,7 @@ module Blockbuster
     SILENT             = false
     ENABLE_DELTAS      = false
     DELTA_DIRECTORY    = 'deltas'.freeze
-    CURRENT_DELTA_NAME = 'current_delta.tar.gz'.freeze
+    CURRENT_DELTA_NAME = 'current_delta'.freeze
     EXTENSION          = '.tar.gz'.freeze
 
     # @param cassette_directory [String] Name of directory cassette files are stored.
@@ -69,6 +69,9 @@ module Blockbuster
 
     def current_delta_name
       @current_delta_name ||= CURRENT_DELTA_NAME
+      @current_delta_name += EXTENSION unless @current_delta_name.include?(EXTENSION)
+
+      @current_delta_name
     end
 
     def key_from_path(file)

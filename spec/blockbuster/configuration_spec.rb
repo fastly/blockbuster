@@ -167,14 +167,25 @@ describe Blockbuster::Configuration do
   end
 
   describe '#current_delta_name' do
-    it 'defaults to CURRENT_DELTA_NAME' do
-      configuration.current_delta_name.must_equal klass::CURRENT_DELTA_NAME
+    it 'defaults to CURRENT_DELTA_NAME with EXTENSION' do
+      expected = "#{klass::CURRENT_DELTA_NAME}#{klass::EXTENSION}"
+
+      configuration.current_delta_name.must_equal expected
     end
 
     it 'returns assigned value' do
       configuration.current_delta_name = 'somefile'
 
-      configuration.current_delta_name.must_equal 'somefile'
+      expected = "somefile#{klass::EXTENSION}"
+
+      configuration.current_delta_name.must_equal expected
+    end
+
+    it 'does not add extension if current_delta_name already includes it' do
+      expected = "test#{klass::EXTENSION}"
+      configuration.current_delta_name = expected
+
+      configuration.current_delta_name.must_equal expected
     end
   end
 
