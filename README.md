@@ -52,11 +52,13 @@ In your `test_helper.rb` add
 ```
 require 'blockbuster'
 
-Blockbuster.configure do |c|
+manager = Blockbuster::Manager.new do |c|
   c.test_directory = File.dirname(__FILE__)
+  c.silent = false
 end
 
-manager = Blockbuster::Manager.new
+# Alternatively you can pass Blockbuster::Manager.new a Blockbuster::Configuration object.  But do not do both.  The block will win if you attempt to do both.  To be clear, passing a configuration as an argument AND additionally providing a block isn't destructive, it just has no purpose.  Pick one or the other.
+
 manager.rent
 ```
 
@@ -70,7 +72,7 @@ end
 
 If there were changes/additions/deletions to your cassette files a new tar.gz cassette file will be created.
 
-#### Blockbuster.configure
+#### Blockbuster::Configuration
 
 The configuration constructor takes the following options:
 
@@ -79,7 +81,7 @@ cassette_directory: String
   Name of directory cassette files are stored.
   Will be stored under the test directory.
   default: 'casssettes'
-cassette_file: String
+master_tar_file: String
   name of gz cassettes file.
   default: 'vcr_cassettes.tar.gz'
 test_directory: String
@@ -91,6 +93,15 @@ silent: Boolean
 wipe_cassette_dir: Boolean
   If true, will wipe the existing cassette directory when `rent` is called.
   default: false
+enable_deltas: Boolean (more on this below)
+  Toggle the Delta feature
+  default: false
+delta_directory: String
+  Name of the directory to store deltas (relative to test_directory)
+  default: 'deltas'
+current_delta_name: String
+  Field that names the current delta
+  default: 'current_delta.tar.gz'
 ```
 
 These are all read-only attributes with the exception of `silent`. This is writeable so that one can suppress output
@@ -109,7 +120,6 @@ initialize the manager with `wipe_cassette_dir: true`.
 
 ```
 manager.rewind?
-manager.compare
 ```
 
 Compares the the files in `test/cassettes` to the files created during setup. Returns `true`
@@ -150,6 +160,22 @@ If you rename a cassette or need to delete one from the archive you need to do t
 > rm test/vcr_cassettes.tar.gz
 > rake test
 ```
+
+### Delta feature (*Experimental*)
+
+If you are working on a project that requires a lot of re-recording, or is in active development with HTTP interactions to different systems and multiple developers working on the project, the benefits of Blockbuster degrade quite quickly.  Merge conflicts happen very frequently since all cassettes are stored in one file, and the only resolution is to re-record everything. 
+
+This is why deltas were built.  The idea is inspired by Sphinx's delta index system.  The idea is to add changes or creations to delta files, and not a master file.  In the typical git branching workflow, this would work as follows:
+
+- If no master file exists, one is generated the first time someone utilizes blockbuster.
+- current_delta_name is set by dynamically retrieving the git branch name (This git-branch retrieval is the responsibility of the application to configure)
+- as long as a master file exists, Blockbuster will only add changes to a new tarball.
+- once you've switched to a new branch (presumably you've gotten your branch merged into master), Blockbuster stops writing to that delta, and only applies changes to a new delta based off the new branch name.
+- The delta file names include a timestamp, based on when the file was packaged.  This allows Blockbuster to use best-effort sorting to load in all delta files.
+- Blockbuster maintains an in-memory datastore of files and their last checksums.  To build this, Blockbuster extracts files from all available tarballs in a sorted order.  The order is always Master first, and then delta files sorted by filename, which for all intents and purposes is based on time of creation (since the name includes a timestamp).  This means that if more than one tarball contains the exact same file, the checksum in the datastore will come from the last file in the sort that contains it.
+- This allows conflicts to become far less possible.  Additionally, even if a conflict does occur, resolving the conflict becomes much easier, as the conflict will be isolated to the changes you are actively working on.
+- Deletions aren't managed by deltas.  This is because we want to maintain the principle of never touching any other tarball other than master or the the current delta.  To actually delete a file, we'd have to remove it from any tarball it exists in.  This isn't worth the advantage of the guarantee of leaving existing deltas alone.  In the end, regenerating a Master file will resolve deleted files.
+- Regenerating a new Master file is actually relatively simple.  The only mechanism required to have Blockbuster do this automatically is to simply delete the existing Master file.  It is additionally currently the responsibility of the application to remove deltas when regenerating a new master file.
 
 ## Development
 
