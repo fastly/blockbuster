@@ -39,7 +39,7 @@ module Blockbuster
 
     def store_current_delta_files
       inventory.each do |k, v|
-        scrubbed = Blockbuster::Delta.file_name_without_timestamp(v['source'])
+        scrubbed = Blockbuster::Delta.file_name_without_timestamp(v[SOURCE])
         current_delta_files << k if scrubbed == configuration.current_delta_name
       end
     end
@@ -50,7 +50,7 @@ module Blockbuster
       if digest.nil?
         silent_puts "New cassette: #{key}"
         return true
-      elsif digest['content'] != new_digest
+      elsif digest[CONTENT] != new_digest
         silent_puts "Cassette changed: #{key}"
         return true
       end
