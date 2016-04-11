@@ -140,4 +140,45 @@ describe Blockbuster::Comparator do
       instance.rewind?([]).must_equal true
     end
   end
+
+  describe '#any_deleted?' do
+    describe 'deltas disabled' do
+      before do
+        configuration.deltas_disabled?.must_equal true
+      end
+
+      it 'returns true if there are any items in the `deleted` queue' do
+        instance.instance_variable_set(:@deleted, %w(a))
+
+        instance.any_deleted?.must_equal true
+      end
+
+      it 'returns false' do
+        instance.deleted.must_equal []
+
+        instance.any_deleted?.must_equal false
+      end
+    end
+
+    describe 'deltas_disabled' do
+      before do
+        configuration.enable_deltas = true
+      end
+
+      it 'returns true if intersection of `current_delta_files` and `deleted` is not empty' do
+        instance.instance_variable_set(:@current_delta_files, %w(a b))
+        instance.instance_variable_set(:@deleted, %w(b))
+
+        (instance.current_delta_files & instance.deleted).wont_be :empty?
+
+        instance.any_deleted?.must_equal true
+      end
+
+      it 'returns false' do
+        (instance.current_delta_files & instance.deleted).must_be :empty?
+
+        instance.any_deleted?.must_equal false
+      end
+    end
+  end
 end
