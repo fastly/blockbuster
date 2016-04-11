@@ -4,6 +4,9 @@ module Blockbuster
     include Blockbuster::FileHelpers
     include Blockbuster::OutputHelpers
 
+    CONTENT = 'content'.freeze
+    SOURCE  = 'source'.freeze
+
     attr_reader :configuration, :inventory, :edited, :current_delta_files
 
     def initialize(configuration)
@@ -15,7 +18,7 @@ module Blockbuster
     end
 
     def add(key, value, source)
-      inventory[key] = { 'content' => value, 'source' => source }
+      inventory[key] = { CONTENT => value, SOURCE => source }
     end
 
     def delete(key)
