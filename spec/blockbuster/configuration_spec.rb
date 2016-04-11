@@ -214,6 +214,13 @@ describe Blockbuster::Configuration do
 
   describe '#master_tar_file_path' do
     it 'returns a concatenation of test_directory and the master_tar_file' do
+      expected = "#{configuration.test_directory}/#{configuration.master_tar_file}#{klass::EXTENSION}"
+
+      configuration.master_tar_file_path.must_equal expected
+    end
+
+    it 'does not add a duplicate extension if the file name already includes it' do
+      configuration.master_tar_file = 'test.tar.gz'
       expected = "#{configuration.test_directory}/#{configuration.master_tar_file}"
 
       configuration.master_tar_file_path.must_equal expected

@@ -1,7 +1,7 @@
 module Blockbuster
   # Manages blockbuster configuration
   class Configuration
-    MASTER_TAR_FILE    = 'vcr_cassettes.tar.gz'.freeze
+    MASTER_TAR_FILE    = 'vcr_cassettes'.freeze
     CASSETTE_DIRECTORY = 'cassettes'.freeze
     TEST_DIRECTORY     = 'test'.freeze
     WIPE_CASSETTE_DIR  = false
@@ -10,6 +10,7 @@ module Blockbuster
     ENABLE_DELTAS      = false
     DELTA_DIRECTORY    = 'deltas'.freeze
     CURRENT_DELTA_NAME = 'current_delta.tar.gz'.freeze
+    EXTENSION          = '.tar.gz'.freeze
 
     # @param cassette_directory [String] Name of directory cassette files are stored.
     #  Will be stored under the test directory. default: 'casssettes'
@@ -85,7 +86,10 @@ module Blockbuster
     end
 
     def master_tar_file_path
-      File.join(test_directory, master_tar_file)
+      name = File.join(test_directory, master_tar_file)
+      name += EXTENSION unless name.include?(EXTENSION)
+
+      name
     end
   end
 end
