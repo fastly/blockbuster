@@ -7,7 +7,7 @@ module Blockbuster
     CONTENT = 'content'.freeze
     SOURCE  = 'source'.freeze
 
-    attr_reader :configuration, :inventory, :edited, :current_delta_files
+    attr_reader :configuration, :inventory, :edited, :current_delta_files, :deleted
 
     def initialize(configuration)
       @configuration       = configuration
