@@ -4,6 +4,8 @@ module Blockbuster
     include Blockbuster::Extractor
     include Blockbuster::Packager
 
+    attr_reader :current, :file_name, :configuration
+
     # nodoc
     class NotEnabledError < StandardError
       def message
@@ -41,8 +43,6 @@ module Blockbuster
     def self.file_name_without_timestamp(file_name)
       file_name.sub(/^\d+_/, '')
     end
-
-    attr_reader :current, :file_name, :configuration
 
     def initialize(file_name, comparator, configuration)
       raise NotEnabledError if configuration.deltas_disabled?
