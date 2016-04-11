@@ -57,7 +57,7 @@ manager = Blockbuster::Manager.new do |c|
   c.silent = false
 end
 
-(Alternatively you can pass Blockbuster::Manager.new a Blockbuster::Configuration object)
+# Alternatively you can pass Blockbuster::Manager.new a Blockbuster::Configuration object.  But do not do both.  The block will win if you attempt to do both.  To be clear, passing a configuration as an argument AND additionally providing a block isn't destructive, it just has no purpose.  Pick one or the other.
 
 manager.rent
 ```
