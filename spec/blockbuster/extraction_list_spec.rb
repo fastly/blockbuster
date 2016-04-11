@@ -26,6 +26,16 @@ describe Blockbuster::ExtractionList do
     end
   end
 
+  describe '#extract_cassettes' do
+    it 'runs `extract_cassettes` on each item returned in `files`' do
+      instance.files.each do |file|
+        file.expects(:extract_cassettes).once
+      end
+
+      instance.extract_cassettes
+    end
+  end
+
   describe 'deltas enabled' do
     let(:delta_one) { Blockbuster::Delta.new('delta_one', comparator, configuration) }
     let(:delta_two) { Blockbuster::Delta.new('delta_two', comparator, configuration) }
@@ -87,6 +97,16 @@ describe Blockbuster::ExtractionList do
           primary = instance.primary
           primary.must_be_instance_of Blockbuster::Delta
           primary.current?.must_equal true
+        end
+      end
+
+      describe '#extract_cassettes' do
+        it 'runs `extract_cassettes` on each item returned in `files`' do
+          instance.files.each do |file|
+            file.expects(:extract_cassettes).once
+          end
+
+          instance.extract_cassettes
         end
       end
     end
