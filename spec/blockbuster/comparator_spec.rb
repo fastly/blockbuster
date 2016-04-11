@@ -14,6 +14,8 @@ describe Blockbuster::Comparator do
       instance.keys.wont_include 'a'
       instance.add('a', 'b', 'c')
       instance.keys.must_include 'a'
+
+      instance.inventory['a'].must_equal 'content' => 'b', 'source' => 'c'
     end
   end
 
