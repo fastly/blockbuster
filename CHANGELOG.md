@@ -1,3 +1,8 @@
+0.4.1
+===
+
+- Use target_path instead of file_name for output
+
 0.4.0
 ===
 
