@@ -6,8 +6,8 @@ require 'blockbuster/version'
 Gem::Specification.new do |spec|
   spec.name          = 'blockbuster'
   spec.version       = Blockbuster::VERSION
-  spec.authors       = ['Lukas Eklund']
-  spec.email         = ['leklund@fastly.com']
+  spec.authors       = ['Lukas Eklund', 'Alexander Bergman', 'Hassan Shahid']
+  spec.email         = ['leklund@fastly.com', 'alexander@fastly.com', 'hassan@fastly.com']
 
   spec.summary       = 'Packaging VCR cassettes for git since 2016'
   spec.homepage      = 'https://github.com/fastly/blockbuster'
@@ -19,9 +19,10 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_development_dependency 'bundler', '~> 1.10'
-  spec.add_development_dependency 'rake', '~> 10.0'
+  spec.add_development_dependency 'bundler-audit'
   spec.add_development_dependency 'minitest'
   spec.add_development_dependency 'mocha'
   spec.add_development_dependency 'pry'
+  spec.add_development_dependency 'rake', '~> 10.0'
   spec.add_development_dependency 'rubocop', '~> 0.37'
 end
