@@ -1,9 +1,11 @@
 # Blockbuster
 
+[![Build Status](https://travis-ci.com/fastly/blockbuster.svg?token=yz7fgdiYXt4CpShcc9L9&branch=master)](https://travis-ci.com/fastly/blockbuster)
+
 Managing your VCR cassettes since 2016.
 
 The task of this gem is to take all your VCR cassettes and package them into one `.tar.gz` file
-for adding to git or other vcs.
+for adding to git or other distributed version control system.
 
 ## Installation
 
@@ -62,7 +64,7 @@ end
 manager.rent
 ```
 
-And then in an after run bock
+And then in an after run block
 
 ```
 Minitest.after_run do
@@ -78,7 +80,7 @@ The configuration constructor takes the following options:
 
 ```
 cassette_directory: String
-  Name of directory cassette files are stored.
+  Name of directory where cassette files are stored.
   Will be stored under the test directory.
   default: 'casssettes'
 master_tar_file: String
