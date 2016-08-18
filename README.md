@@ -1,6 +1,6 @@
 # Blockbuster
 
-[![Build Status](https://travis-ci.com/fastly/blockbuster.svg?token=yz7fgdiYXt4CpShcc9L9&branch=master)](https://travis-ci.com/fastly/blockbuster)
+[![Build Status](https://travis-ci.org/fastly/blockbuster.svg?branch=master)](https://travis-ci.org/fastly/blockbuster)
 
 Managing your VCR cassettes since 2016.
 
