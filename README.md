@@ -7,6 +7,38 @@ Managing your VCR cassettes since 2016.
 The task of this gem is to take all your VCR cassettes and package them into one `.tar.gz` file
 for adding to git or other distributed version control system.
 
+## Use cases
+
+Blockbuster was built to tackle some of the problems with VCR when
+cassettes are checked into a version control system like git. Some of the problems
+were the sheer amount of noise from all the cassette files,
+merge conflicts, lost time, and failing builds due to old cassettes
+overwriting new cassettes. The biggest issue we had was the inability to
+review PR's in github as the enormous diffs generated would cause github
+to hide changes that needed to be reviewed. Github's per-commit view has helped
+mitigate this but that doesn't help in cases where PR's are squashed.
+
+If you are checking in large amounts of cassettes to git
+and they are changing regularly, Blockbuster can help
+reduce noise, conflicts, and hopefully make the development
+workflow easier.
+
+#### Reduce noise:
+
+If your workflow requires that every change is a review pull request, any
+PR with several updated cassettes can make githubs diff comparison almost
+useless. One small change to a client for a 3rd party service can result
+in hundreds of files to diff.
+
+#### Reduce merge conflicts
+
+VCR cassettes are not always easily merged and dealing with the merge conflicts
+is maddening and a huge time waster. Having a single master cassette file works
+to fix merge conflicts but that introduced a new problem where multiple
+PRs could have different master cassette files and the last file would win.
+The delta feature keeps only new cassettes in a secondardy delta file that
+is checked in.
+
 ## Installation
 
 Add this line to your application's Gemfile:
