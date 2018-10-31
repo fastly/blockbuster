@@ -57,7 +57,7 @@ module Blockbuster
       dir = configuration.cassette_dir
 
       silent_puts "Wiping cassettes directory: #{dir}"
-      FileUtils.rm_r(dir) if Dir.exist?(dir)
+      FileUtils.rm_rf(dir) if Dir.exist?(dir)
     end
   end
 end
