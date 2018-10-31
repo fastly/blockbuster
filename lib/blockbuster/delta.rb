@@ -4,7 +4,7 @@ module Blockbuster
     include Blockbuster::Extractor
     include Blockbuster::Packager
 
-    attr_reader :current, :file_name, :configuration
+    attr_reader :file_name, :configuration
 
     # nodoc
     class NotEnabledError < StandardError

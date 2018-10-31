@@ -9,16 +9,16 @@ describe Blockbuster::Configuration do
   end
 
   it 'has configuration attributes' do
-    attrs = [
-      :cassette_directory,
-      :master_tar_file,
-      :local_mode,
-      :test_directory,
-      :wipe_cassette_dir,
-      :silent,
-      :enable_deltas,
-      :delta_directory,
-      :current_delta_name
+    attrs = %i[
+      cassette_directory
+      master_tar_file
+      local_mode
+      test_directory
+      wipe_cassette_dir
+      silent
+      enable_deltas
+      delta_directory
+      current_delta_name
     ]
 
     attrs.each do |attr|

@@ -146,7 +146,7 @@ describe Blockbuster::Manager do
       end
 
       it 'creates a new cassette file if rewind? is true' do
-        open(cassette_2, 'a') do |file|
+        open(cassette_2, 'a') do |file| # rubocop:disable Security/Open
           file << 'new recording'
         end
 
@@ -169,7 +169,7 @@ describe Blockbuster::Manager do
       end
 
       it 'returns true if a cassette file was changed' do
-        open(cassette_2, 'a') do |file|
+        open(cassette_2, 'a') do |file| # rubocop:disable Security/Open
           file << 'new recording'
         end
 

@@ -202,14 +202,14 @@ describe 'DeltaFeature' do
       config.current_delta_name = 'delta_a.tar.gz'
 
       manager.rent
-      first_rent = YAML.load(File.open("#{config.cassette_dir}/test_a.yml"))
+      first_rent = YAML.safe_load(File.open("#{config.cassette_dir}/test_a.yml"))
       File.truncate("#{config.cassette_dir}/test_b.yml", 1)
       manager.drop_off
 
       FileUtils.rm_r("#{unique_dir}/cassettes")
       manager_2 = Blockbuster::Manager.new(config)
       manager_2.rent
-      second_rent = YAML.load(File.open("#{config.cassette_dir}/test_a.yml"))
+      second_rent = YAML.safe_load(File.open("#{config.cassette_dir}/test_a.yml"))
 
       first_rent.must_equal second_rent
     end

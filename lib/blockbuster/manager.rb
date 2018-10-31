@@ -40,10 +40,10 @@ module Blockbuster
 
     # repackages cassettes into a compressed tarball
     def drop_off(force: false)
-      if comparator.rewind?(configuration.cassette_files) || force
-        silent_puts "Recreating cassette file #{@extraction_list.primary.target_path}"
-        @extraction_list.primary.create_cassette_file
-      end
+      return unless comparator.rewind?(configuration.cassette_files) || force
+
+      silent_puts "Recreating cassette file #{@extraction_list.primary.target_path}"
+      @extraction_list.primary.create_cassette_file
     end
 
     alias setup rent
