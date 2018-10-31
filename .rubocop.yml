@@ -2,3 +2,7 @@ LineLength:
   Enabled: false
 Style/FrozenStringLiteralComment:
   Enabled: false
+Metrics/BlockLength:
+  Enabled: false
+Naming/VariableNumber:
+  Enabled: false

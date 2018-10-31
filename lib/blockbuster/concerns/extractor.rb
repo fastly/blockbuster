@@ -3,6 +3,7 @@ module Blockbuster
   module Extractor
     def extract_cassettes
       return unless File.exist?(file_path)
+
       File.open(file_path, 'rb') do |file|
         Zlib::GzipReader.wrap(file) do |gz|
           Gem::Package::TarReader.new(gz) do |tar|

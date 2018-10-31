@@ -10,8 +10,8 @@ end
 
 desc 'Run rubocop'
 RuboCop::RakeTask.new do |task|
-  task.options       = %w(--display-cop-names)
-  task.formatters    = %w(fuubar)
+  task.options       = %w[--display-cop-names]
+  task.formatters    = %w[fuubar]
   task.fail_on_error = true
 end
 

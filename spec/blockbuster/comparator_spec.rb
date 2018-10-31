@@ -43,7 +43,7 @@ describe Blockbuster::Comparator do
       instance.add('a', 'b', 'c')
       instance.add('b', 'c', 'd')
       instance.keys.size.must_be :>, 0
-      instance.keys.sort.must_equal %w(a b)
+      instance.keys.sort.must_equal %w[a b]
     end
   end
 
@@ -62,7 +62,7 @@ describe Blockbuster::Comparator do
 
   describe '#compare' do
     it 'returns true if first argument does not exist as hash key' do
-      instance.keys.include?('fakekey').must_equal false
+      instance.keys.include?('fakekey').must_equal false # rubocop:disable Performance/InefficientHashSearch
 
       instance.compare('fakekey', 'blah').must_equal true
     end
@@ -148,7 +148,7 @@ describe Blockbuster::Comparator do
       end
 
       it 'returns true if there are any items in the `deleted` queue' do
-        instance.instance_variable_set(:@deleted, %w(a))
+        instance.instance_variable_set(:@deleted, %w[a])
 
         instance.any_deleted?.must_equal true
       end
@@ -166,8 +166,8 @@ describe Blockbuster::Comparator do
       end
 
       it 'returns true if intersection of `current_delta_files` and `deleted` is not empty' do
-        instance.instance_variable_set(:@current_delta_files, %w(a b))
-        instance.instance_variable_set(:@deleted, %w(b))
+        instance.instance_variable_set(:@current_delta_files, %w[a b])
+        instance.instance_variable_set(:@deleted, %w[b])
 
         (instance.current_delta_files & instance.deleted).wont_be :empty?
 
