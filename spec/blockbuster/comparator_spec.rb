@@ -62,7 +62,7 @@ describe Blockbuster::Comparator do
 
   describe '#compare' do
     it 'returns true if first argument does not exist as hash key' do
-      instance.keys.include?('fakekey').must_equal false # rubocop:disable Performance/InefficientHashSearch
+      instance.keys.include?('fakekey').must_equal false
 
       instance.compare('fakekey', 'blah').must_equal true
     end
