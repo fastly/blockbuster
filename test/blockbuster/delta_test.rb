@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'test_helper'
 
 describe Blockbuster::Delta do
   let(:configuration)      { Blockbuster::Configuration.new }

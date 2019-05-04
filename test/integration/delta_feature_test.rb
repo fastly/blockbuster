@@ -1,8 +1,8 @@
-require 'spec_helper'
+require 'test_helper'
 require 'yaml'
 
 describe 'DeltaFeature' do
-  let(:base_dir)    { 'spec/integration_fixtures' }
+  let(:base_dir)    { 'test/integration_fixtures' }
   let(:unique_id)   { Digest::MD5.hexdigest(location) }
   let(:unique_dir)  { "#{base_dir}/#{unique_id}" }
   let(:config)      { Blockbuster::Configuration.new }
