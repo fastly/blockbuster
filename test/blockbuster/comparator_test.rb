@@ -76,7 +76,7 @@ describe Blockbuster::Comparator do
     it 'returns nil otherwise' do
       instance.add('somekey', 'somevalue', 'somesource')
 
-      instance.compare('somekey', 'somevalue').must_equal nil
+      instance.compare('somekey', 'somevalue').must_be_nil
     end
   end
 
