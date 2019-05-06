@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'test_helper'
 
 describe Blockbuster::Comparator do
   let(:configuration)   { Blockbuster::Configuration.new }

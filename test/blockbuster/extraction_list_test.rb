@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'test_helper'
 
 describe Blockbuster::ExtractionList do
   let(:configuration)     { Blockbuster::Configuration.new }

@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'test_helper'
 
 describe Blockbuster do
   it 'has a version number' do

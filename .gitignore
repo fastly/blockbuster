@@ -5,7 +5,8 @@
 /coverage/
 /doc/
 /pkg/
-/spec/reports/
+/test/reports/
 /tmp/
-!/spec/fixtures/*gz
-/test/
+/test/deltas/*gz
+/test/*gz
+!/test/fixtures/*gz

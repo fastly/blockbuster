@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'test_helper'
 
 describe Blockbuster::Configuration do
   let(:klass)         { Blockbuster::Configuration }
